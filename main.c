@@ -127,12 +127,49 @@ void readCodes(node *root, int size, int **codes, int *tmp, int level){
     }
 }
 
-int main(){
+int main( int argc, char **argv) {
 
-    char arr[] = { 'a', 'b', 'c', 'd', 'e'};
-    int freq[] = { 3, 2, 1, 4, 1};
+    if( argc < 2 ) {
+        fprintf( stderr, "Lack of arguments ");
+        return EXIT_FAILURE;
+    }
+
+    FILE *in = fopen( argv[1], "r");
+    if( in == NULL) {
+        fprintf( stderr, "This file don`t exist");
+        return EXIT_FAILURE;
+    }
+
+    char c;
+    int counter, uniquecounter = 0;
+    int charcounter[128] =  { 0 };
+
+    while ( ( c = fgetc(in) ) != EOF) {
+        counter ++;
+        if( c >= 0 &&  c <= 127)
+            charcounter[ c - 0]++;
+            if (charcounter[ c - 0] == 1)
+                uniquecounter++;
+    }
+    printf("%d\n", uniquecounter);
+
+    char *arr = malloc( uniquecounter * sizeof(char));
+    int *freq = malloc( uniquecounter * sizeof(int));
+
+    for (int i = 0, j = 0; i < 128; i++) {
+        if( charcounter[i] != 0) {
+            arr[j] = i;
+            freq[j] = charcounter[i];
+            j++;
+        }
+    }
+
+    //char arr[] = { 'a', 'b', 'c', 'd', 'e'};
+    //int freq[] = { 3, 2, 1, 4, 1};
+    
  
-    int size = sizeof(arr) / sizeof(arr[0]);
+    //int size = sizeof(arr) / sizeof(arr[0]);
+    int size = uniquecounter;
     int queueSize = 2 * size - 1;
 
     // output codes array 
@@ -194,5 +231,7 @@ int main(){
     }
     free(codes);
 
+    fclose(in);
+    
     return 0;
 }
