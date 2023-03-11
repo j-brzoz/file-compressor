@@ -143,12 +143,12 @@ int main( int argc, char **argv) {
     char c;
     int counter, uniquecounter = 0;
     int charcounter[128] =  { 0 };
-
+    // counting characters in file
     while ( ( c = fgetc(in) ) != EOF) {
         counter ++;
         if( c >= 0 &&  c <= 127)
-            charcounter[ c - 0]++;
-            if (charcounter[ c - 0] == 1)
+            charcounter[c]++;
+            if (charcounter[c] == 1)
                 uniquecounter++;
     }
     printf("%d\n", uniquecounter);
