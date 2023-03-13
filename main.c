@@ -7,13 +7,13 @@
 int main( int argc, char **argv) {
 
     if( argc < 2 ) {
-        fprintf( stderr, "Lack of arguments ");
+        fprintf( stderr, "Lack of arguments!");
         return EXIT_FAILURE;
     }
 
     FILE *in = fopen( argv[1], "r");
     if( in == NULL) {
-        fprintf( stderr, "This file don`t exist");
+        fprintf( stderr, "This file doesn't exist!");
         return EXIT_FAILURE;
     }
 
@@ -53,12 +53,12 @@ int main( int argc, char **argv) {
     // first row char
     // second row code length
     // next code
-    int **codes;
+    char **codes;
     codes = malloc(size * sizeof *codes);
     for(int i = 0; i < size; i++)
         codes[i] = NULL;
         
-    int tmp[size - 1];
+    char tmp[size - 1];
     
     // make queue
     node **queue = malloc(queueSize * sizeof *queue);
@@ -91,9 +91,10 @@ int main( int argc, char **argv) {
     // print codes
     for(int i = 0; i < size; i++){
         printf("c: %c   ", codes[i][0]);
-        for(int j = 0; j < codes[i][1]; j++){
-            printf("%d", codes[i][j+2]);
+        for(int j = 0; j < (int)codes[i][1]; j++){
+            printf("%c", codes[i][j+2]);
         }
+        
         printf("\n");
     }
 
