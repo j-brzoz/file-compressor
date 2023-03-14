@@ -4,6 +4,16 @@
 #include "sort.h"
 #include "queue.h"
 
+int binToDec(char *binary){
+    int power = 1;
+    int output = 0;
+    for(int i = 0; i < 8; i++) {
+        output += (binary[7-i]-48) * power;
+        power *= 2;
+    }
+    return output;
+}
+
 int main( int argc, char **argv) {
 
     if( argc < 2 ) {
@@ -98,6 +108,73 @@ int main( int argc, char **argv) {
         printf("\n");
     }
 
+
+    FILE *out = fopen( "output.huff", "wb+");
+
+    rewind(in);
+
+    char* character = malloc(sizeof *character);
+    char *characterBinary = malloc(8 * sizeof *characterBinary);
+    characterBinary[0] = 0;
+    char *bufor = malloc(256 * sizeof *bufor);
+    int buforLength = 0;
+
+    while ( ( c = fgetc(in) ) != EOF) {
+        
+        // find character in codes
+        for(int i = 0; i < size; i++) {
+            if(c == codes[i][0]) {
+                
+                // write code to bufor
+                for(int j = 0; j < (int)codes[i][1]; j++) {
+                    bufor[buforLength+j] = codes[i][j+2];
+                }
+                buforLength += (int)codes[i][1];
+            }
+        }
+        
+        while(buforLength >= 7) {
+        
+            // get code from bufor
+            for(int i = 1; i < 8; i++) {
+                characterBinary[i] = bufor[i-1];
+            }
+            
+            // convert code to char
+            character[0] = binToDec(characterBinary);
+            
+            // write character
+            fwrite(character, 1, 1, out);
+            
+            // move codes in bufor
+            for(int i = 0; i < buforLength - 7; i++){
+                bufor[i] = bufor[i + 7];
+            }
+            buforLength -= 7;
+        }
+    }
+
+    if(buforLength != 0){
+        
+        // get code from bufor
+        for(int i = 1; i <= buforLength; i++) {
+                characterBinary[i] = bufor[i-1];
+        }
+        
+        // level up to 8 bits
+        for(int i = buforLength+1; i < 8; i++) {
+                characterBinary[i] = '0';
+        }
+        
+        // convert code to char
+        character[0] = binToDec(characterBinary);
+        
+        // write character
+        fwrite(character, 1, 1, out);
+    }
+
+
+    
     // free memory
     for(int i = 0; i < queueSize; i++){
         free(queue[i]);
@@ -108,7 +185,11 @@ int main( int argc, char **argv) {
         free(codes[i]);
     }
     free(codes);
+    free(bufor);
+    free(characterBinary);
+    free(character);
 
+    fclose(out);
     fclose(in);
     
     return 0;
