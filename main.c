@@ -38,7 +38,7 @@ int main( int argc, char **argv) {
             if (charcounter[c] == 1)
                 uniquecounter++;
     }
-    printf("%d\n", uniquecounter);
+    printf("unique characters: %d\n", uniquecounter);
 
     char *arr = malloc( uniquecounter * sizeof(char));
     int *freq = malloc( uniquecounter * sizeof(int));
