@@ -80,7 +80,7 @@ int main( int argc, char **argv) {
     if(inputSize == 8)
         uniqueCounter = eightAnalyzeInput(in, charcounter, uniqueCounter);
     else if(inputSize == 16)
-        uniqueCounter = sixteenAnalyzeInput(inputBuforLength, inputBufor, in, charcounter, uniqueCounter, input);
+        uniqueCounter = sixteenAnalyzeInput(in, charcounter, uniqueCounter);
     else if(inputSize == 12)
         uniqueCounter = twelveAnalyzeInput(inputBuforLength, inputBufor, in, charcounter, uniqueCounter, input);
 
@@ -170,7 +170,7 @@ int main( int argc, char **argv) {
     if(inputSize == 8)
         eightOutputGenerator(in, uniqueCounter, codes, out);
     else if(inputSize == 16)
-        sixteenOutputGenerator(inputBuforLength, inputBufor, in, input, bufor, buforLength, character, characterBinary, uniqueCounter, codes, out);
+        sixteenOutputGenerator(in, uniqueCounter, codes, out);
     else if(inputSize == 12)
         twelveOutputGenerator(inputBuforLength, inputBufor, in, input, bufor, buforLength, character, characterBinary, uniqueCounter, codes, out);
 

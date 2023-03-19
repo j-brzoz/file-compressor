@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-int sixteenAnalyzeInput(int inputBuforLength, char* inputBufor, FILE* in, int* charcounter, int uniquecounter, unsigned short input);
+int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter );
 
-void sixteenOutputGenerator(int inputBuforLength, char* inputBufor, FILE* in, unsigned short input, char* bufor, int buforLength, char* character, char* characterBinary, int size, unsigned short** codes, FILE *out);
+void sixteenOutputGenerator(FILE* in, int uniqueCounter, unsigned short** codes, FILE *out);
 
 #endif
