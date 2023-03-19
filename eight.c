@@ -1,49 +1,60 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "convert.h"
 
-int eightAnalyzeInput(int inputBuforLength, char* inputBufor, FILE* in, int* charcounter, int uniquecounter){ 
-    // count chars in the file
-    // while ( ( c = fgetc(in) ) != EOF) {
-    //     counter++;
-    //     fprintf(stderr, "check ");
-    //     charcounter[(unsigned short)c]++;
-    //     if (charcounter[(unsigned short)c] == 1)
-    //         uniquecounter++;
-    // }
-    // fprintf(stderr, "check2 ");
-    // printf("unique characters: %d\n", uniquecounter);
-    int tempo = 0;
-    while (inputBuforLength = fread( inputBufor, 1, 1200, in ))
-    {
-        for(int i = 0; i < inputBuforLength; i++){
-            if((unsigned short)inputBufor[i] >= 0 && (unsigned short)inputBufor[i] <= 255){
-                charcounter[(unsigned short)inputBufor[i]]++;
-                if (charcounter[(unsigned short)inputBufor[i]] == 1)
-                    uniquecounter++;
+int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
+    
+    // bufor for reading from input file
+    char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    // size of input bufor
+    int inputBuforLength;
+
+    // read 1200 bytes
+    while ( inputBuforLength = fread( inputBufor, 1, 1200, in ) ) {
+        for( int i = 0; i < inputBuforLength; i++ ) {
+            // make sure the input is correct
+            if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 ) {
+                charcounter[( unsigned short )inputBufor[i]]++;
+                if ( charcounter[( unsigned short )inputBufor[i]] == 1 )
+                    uniqueCounter++;
             }
         }
-        tempo += 1200;
     }
-    printf("unique characters: %d\n", uniquecounter);
-    return uniquecounter;       
+    free( inputBufor );
+    return uniqueCounter;       
 }
 
-void eightOutputGenerator(char c, FILE* in, char* bufor, int buforLength, char* character, char* characterBinary, int size, unsigned short** codes, FILE *out){
-    while ( ( c = fgetc(in) ) != EOF) {
+void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out ) {
+    
+    // char read from the file
+    char c;
+    // charcter that will be put in the output file
+    char* character = malloc( sizeof *character );
+    // binary representation of charcter   
+    char *characterBinary = malloc( 8 * sizeof *characterBinary );
+    characterBinary[0] = 0;
+    // bufor with codes from characters found in the input
+    char *bufor = malloc( 16384 * sizeof *bufor );
+    // length of the bufor
+    int buforLength = 0;
+
+    // get chararcter
+    while ( ( c = fgetc( in ) ) != EOF ) {
             
         // find character in codes
-        for(int i = 0; i < size; i++) {
-            if(c == codes[i][0]) {
+        for( int i = 0; i < uniqueCounter; i++ ) {
+            if( c == codes[i][0] ) {
                 
                 // write code to bufor
-                for(int j = 0; j < (int)codes[i][1]; j++) {
+                for( int j = 0; j < codes[i][1]; j++ ) {
                     bufor[buforLength+j] = codes[i][j+2];
                 }
-                buforLength += (int)codes[i][1];
+                buforLength += codes[i][1];
             }
         }
         
-        while(buforLength >= 7) {
+        // if enough bits in bufor
+        while( buforLength >= 7 ) {
         
             // get code from bufor
             for(int i = 1; i < 8; i++) {
@@ -51,35 +62,40 @@ void eightOutputGenerator(char c, FILE* in, char* bufor, int buforLength, char* 
             }
             
             // convert code to char
-            character[0] = binToDec(characterBinary);
+            character[0] = binToDec( characterBinary );
             
             // write character
-            fwrite(character, 1, 1, out);
+            fwrite( character, 1, 1, out );
             
             // move codes in bufor
-            for(int i = 0; i < buforLength - 7; i++){
+            for( int i = 0; i < buforLength - 7; i++ ) {
                 bufor[i] = bufor[i + 7];
             }
             buforLength -= 7;
         }
     }   
 
-    if(buforLength != 0){
+    // if any bites left in bufor
+    if( buforLength != 0 ) {
         
         // get code from bufor
-        for(int i = 1; i <= buforLength; i++) {
+        for( int i = 1; i <= buforLength; i++ ) {
                 characterBinary[i] = bufor[i-1];
         }
         
         // level up to 8 bits
-        for(int i = buforLength+1; i < 8; i++) {
+        for( int i = buforLength+1; i < 8; i++ ) {
                 characterBinary[i] = '0';
         }
         
         // convert code to char
-        character[0] = binToDec(characterBinary);
+        character[0] = binToDec( characterBinary );
         
         // write character
-        fwrite(character, 1, 1, out);
+        fwrite( character, 1, 1, out );
     }
+
+    free( bufor );
+    free( character );
+    free( characterBinary );
 }

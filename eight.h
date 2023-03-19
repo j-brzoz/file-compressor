@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-int eightAnalyzeInput(int inputBuforLength, char* inputBufor, FILE* in, int* charcounter, int uniquecounter);
+int eightAnalyzeInput( FILE* in, int* charcounter, int uniquecounter );
 
-void eightOutputGenerator(char c, FILE* in, char* bufor, int buforLength, char* character, char* characterBinary, int size, unsigned short** codes, FILE *out);
+void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out );
 
 #endif
