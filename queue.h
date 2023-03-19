@@ -12,6 +12,6 @@ node *findMinNotUsedNode(node **queue, int queueSize);
 
 void addNewNodeToQueue(node **queue, int queueSize);
 
-void readCodes(node *root, int size, char **codes, char *tmp, int level);
+void readCodes(node *root, int size, unsigned short **codes, unsigned short *tmp, int level);
 
 #endif

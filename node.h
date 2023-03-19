@@ -5,13 +5,13 @@
 #include <stdbool.h>
 
 typedef struct node{
-    char *value;
+    unsigned short *value;
     int freq;
     bool used;
     struct node *left;
     struct node *right;
 }node;
 
-node *makeNode(char *character, int frequency, bool used, node *left, node *right);
+node *makeNode(unsigned short *character, int frequency, bool used, node *left, node *right);
 
 #endif

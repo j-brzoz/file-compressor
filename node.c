@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // makes a node
-node *makeNode(char *character, int frequency, bool used, node *left, node *right){
+node *makeNode(unsigned short *character, int frequency, bool used, node *left, node *right){
     node *treeNode = malloc(sizeof *treeNode);
     treeNode->value = treeNode->value;
     treeNode->left = treeNode->left;

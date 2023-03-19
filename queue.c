@@ -46,7 +46,7 @@ void addNewNodeToQueue(node **queue, int queueSize){
 }
 
 // put values in codes array
-void readCodes(node *root, int size, char **codes, char *tmp, int level){
+void readCodes(node *root, int size, unsigned short **codes, unsigned short *tmp, int level){
     if(root->left != NULL){
         tmp[level] = '1';
         readCodes(root->left, size, codes, tmp, level + 1);
@@ -61,8 +61,8 @@ void readCodes(node *root, int size, char **codes, char *tmp, int level){
         for(int i = 0; i < size; i++){
             if(codes[i] == NULL){
                 codes[i] = malloc((level+1) * sizeof *codes);
-                codes[i][0] = (*root->value);
-                codes[i][1] = (char)level;
+                codes[i][0] = (short)(*root->value);
+                codes[i][1] = level;
                 for(int j = 0; j < level; j++){
                     codes[i][j+2] = tmp[j];
                 }
