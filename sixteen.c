@@ -197,4 +197,8 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
         // write character
         fwrite(character, 1, 1, out);
     }
+    free( inputBufor );
+    free( character );
+    free( characterBinary );
+    free( bufor );
 }
