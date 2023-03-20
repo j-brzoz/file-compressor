@@ -41,19 +41,10 @@ int main( int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-
-    // for chars reading from the file
-    char c;
     // number of unique chars
     int uniqueCounter = 0;
     // number of possible chars
     int possibleChars ;
-    // bufor for reading from input file
-    char *inputBufor = malloc(1200 * sizeof *inputBufor);
-    // character conversion from binary to decimal 
-    unsigned short input;
-    // size of input bufor
-    int inputBuforLength;
     // array where index represents char and 
     // value how many times that char has been found in the file
     int *charcounter;
@@ -82,7 +73,7 @@ int main( int argc, char **argv) {
     else if(inputSize == 16)
         uniqueCounter = sixteenAnalyzeInput(in, charcounter, uniqueCounter);
     else if(inputSize == 12)
-        uniqueCounter = twelveAnalyzeInput(inputBuforLength, inputBufor, in, charcounter, uniqueCounter, input);
+        uniqueCounter = twelveAnalyzeInput(in, charcounter, uniqueCounter);
 
     // characters found in the input
     unsigned short *arr = malloc( uniqueCounter * sizeof *arr);
@@ -156,23 +147,13 @@ int main( int argc, char **argv) {
     //rewind the input file
     rewind(in);
 
-    // charcter that will be put in the output file
-    char* character = malloc(sizeof *character);
-    // binary representation of charcter   
-    char *characterBinary = malloc(8 * sizeof *characterBinary);
-    characterBinary[0] = 0;
-    // bufor with codes from characters found in the input
-    char *bufor = malloc(16384 * sizeof *bufor);
-    // length of the bufor
-    int buforLength = 0;
-
     // generate output
     if(inputSize == 8)
         eightOutputGenerator(in, uniqueCounter, codes, out);
     else if(inputSize == 16)
         sixteenOutputGenerator(in, uniqueCounter, codes, out);
     else if(inputSize == 12)
-        twelveOutputGenerator(inputBuforLength, inputBufor, in, input, bufor, buforLength, character, characterBinary, uniqueCounter, codes, out);
+        twelveOutputGenerator(in, uniqueCounter, codes, out);
 
     // check message
     printf("everything went well!\n");
@@ -187,14 +168,9 @@ int main( int argc, char **argv) {
         free(codes[i]);
     }
     free(codes);
-    free(bufor);
-    free(characterBinary);
-    free(character);
-    free(inputBufor);
     free(charcounter);
     free(freq);
     free(arr);
-
     fclose(out);
     fclose(in);
     
