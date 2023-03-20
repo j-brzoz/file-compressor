@@ -8,6 +8,41 @@
 #include "twelve.h"
 #include "sixteen.h"
 
+void dictionary( node *pointer, node *border, node *root, node *last) {
+        node *tmp = pointer;
+        while( pointer->left != NULL) {
+            pointer = pointer->left;
+        }
+        if( tmp == root) {
+            fprintf( stdout, "%c", *(pointer->value));
+        }
+        else {
+            fprintf( stdout, "01");
+            fprintf( stdout, "%c", *(pointer->value));
+        }
+        
+        while (pointer->parent != border) {
+            if (  pointer->parent->right != NULL) {
+                if ( pointer->parent->right->value != NULL) {
+                    if( pointer->parent->right != last) {
+                        fprintf( stdout, "01");
+                        fprintf( stdout,  "%c", *(pointer->parent->right->value));
+                    }
+                    else {
+                        fprintf( stdout, "11");
+                        fprintf( stdout,  "%c", *(pointer->parent->right->value));
+                    }
+                }
+                else  {
+                    fprintf( stdout, "00");
+                    dictionary( pointer->parent->right, pointer->parent, root, last);
+                }
+            }
+            pointer = pointer->parent;
+        }
+        
+    }
+
 int main( int argc, char **argv) {
     
     // check if file and compression rate have been given
@@ -117,7 +152,7 @@ int main( int argc, char **argv) {
 
     // put inputs in a queue
     for(int i = 0; i < uniqueCounter; i++){
-        node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL);
+        node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL, NULL);
         if(tmpNode == NULL){
             return 1;
         }
@@ -140,6 +175,16 @@ int main( int argc, char **argv) {
 
     // read codes from tree
     readCodes(queue[queueSize-1], uniqueCounter, codes, tmp, 0);
+
+    node *dicpoint;
+    dicpoint = queue[queueSize - 1];
+    node *tmp2 = dicpoint;
+    while ( tmp2->right != NULL) {
+        tmp2 = tmp2->right;
+    }
+
+    dictionary( dicpoint, NULL, queue[queueSize - 1], tmp2 );
+    printf("\n");
 
     // print codes
     // for(int i = 0; i < uniqueCounter; i++){
