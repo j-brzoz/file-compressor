@@ -32,7 +32,6 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     char* character = malloc( sizeof *character );
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
-    characterBinary[0] = 0;
     // bufor with codes from characters found in the input
     char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
@@ -54,24 +53,24 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
         }
         
         // if enough bits in bufor
-        while( buforLength >= 7 ) {
+        while( buforLength >= 8 ) {
         
             // get code from bufor
-            for(int i = 1; i < 8; i++) {
-                characterBinary[i] = bufor[i-1];
+            for(int i = 0; i < 8; i++) {
+                characterBinary[i] = bufor[i];
             }
             
             // convert code to char
             character[0] = binToDec( characterBinary );
             
             // write character
-            fwrite( character, 1, 1, out );
+            fwrite( character, sizeof(char), 1, out );
             
             // move codes in bufor
-            for( int i = 0; i < buforLength - 7; i++ ) {
-                bufor[i] = bufor[i + 7];
+            for( int i = 0; i < buforLength - 8; i++ ) {
+                bufor[i] = bufor[i + 8];
             }
-            buforLength -= 7;
+            buforLength -= 8;
         }
     }   
 
@@ -79,12 +78,12 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     if( buforLength != 0 ) {
         
         // get code from bufor
-        for( int i = 1; i <= buforLength; i++ ) {
+        for( int i = 0; i <= buforLength; i++ ) {
                 characterBinary[i] = bufor[i-1];
         }
         
         // level up to 8 bits
-        for( int i = buforLength+1; i < 8; i++ ) {
+        for( int i = buforLength; i < 8; i++ ) {
                 characterBinary[i] = '0';
         }
         
