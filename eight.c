@@ -78,8 +78,8 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     if( buforLength != 0 ) {
         
         // get code from bufor
-        for( int i = 0; i <= buforLength; i++ ) {
-                characterBinary[i] = bufor[i-1];
+        for( int i = 0; i < buforLength; i++ ) {
+                characterBinary[i] = bufor[i];
         }
         
         // level up to 8 bits
