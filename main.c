@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "node.h"
 #include "sort.h"
 #include "queue.h"
@@ -40,6 +41,23 @@ int main( int argc, char **argv) {
         fprintf( stderr, "Wrong compression rate! Available rates: 1 or 2 or 3");
         return EXIT_FAILURE;
     }
+
+    // default password for data encrypting (doesn't change anything)
+    char password = 0;
+
+    // if password was given by the user
+    if( argc >= 4) {
+        
+        // input password from the user
+        char *inputPassword = argv[3];
+
+        // xor every char
+        password = inputPassword[0];
+        for(int i = 1; i < strlen(inputPassword); i++){
+            password = password ^ inputPassword[i];
+        }
+    }
+
 
     // number of unique chars
     int uniqueCounter = 0;
@@ -149,11 +167,11 @@ int main( int argc, char **argv) {
 
     // generate output
     if(inputSize == 8)
-        eightOutputGenerator(in, uniqueCounter, codes, out);
+        eightOutputGenerator(in, uniqueCounter, codes, out, password);
     else if(inputSize == 16)
-        sixteenOutputGenerator(in, uniqueCounter, codes, out);
+        sixteenOutputGenerator(in, uniqueCounter, codes, out, password);
     else if(inputSize == 12)
-        twelveOutputGenerator(in, uniqueCounter, codes, out);
+        twelveOutputGenerator(in, uniqueCounter, codes, out, password);
 
     // check message
     printf("everything went well!\n");

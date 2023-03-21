@@ -112,7 +112,7 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;
 }
 
-void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out){
+void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
@@ -185,7 +185,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
             }
             
             // convert code to char
-            character[0] = binToDec( characterBinary );
+            character[0] = binToDec( characterBinary ) ^ password;
             
             // write character
             fwrite( character, 1, 1, out );
@@ -260,7 +260,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
             }
             
             // convert code to char
-            character[0] = binToDec( characterBinary );
+            character[0] = binToDec( characterBinary ) ^ password;
             
             // write character
             fwrite( character, 1, 1, out );
@@ -284,7 +284,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
         }
         
         // convert code to char
-        character[0] = binToDec( characterBinary );
+        character[0] = binToDec( characterBinary ) ^ password;
         
         // write character
         fwrite( character, 1, 1, out );

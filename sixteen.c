@@ -71,7 +71,7 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;
 }
 
-void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out){
+void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
@@ -124,7 +124,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
             }
             
             // convert code to char
-            character[0] = binToDec( characterBinary );
+            character[0] = binToDec( characterBinary ) ^ password;
             
             // write character
             fwrite( character, 1, 1, out );
@@ -166,7 +166,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
             }
             
             // convert code to char
-            character[0] = binToDec(characterBinary);
+            character[0] = binToDec(characterBinary) ^ password;
 
             // write character
             fwrite(character, 1, 1, out);
@@ -192,7 +192,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
         }
         
         // convert code to char
-        character[0] = binToDec(characterBinary);
+        character[0] = binToDec(characterBinary) ^ password;
         
         // write character
         fwrite(character, 1, 1, out);

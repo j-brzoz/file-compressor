@@ -24,7 +24,7 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;       
 }
 
-void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out ) {
+void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password ) {
     
     // char read from the file
     char c;
@@ -61,7 +61,7 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
             }
             
             // convert code to char
-            character[0] = binToDec( characterBinary );
+            character[0] = binToDec( characterBinary ) ^ password;
             
             // write character
             fwrite( character, sizeof(char), 1, out );
@@ -88,7 +88,7 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
         }
         
         // convert code to char
-        character[0] = binToDec( characterBinary );
+        character[0] = binToDec( characterBinary ) ^ password;
         
         // write character
         fwrite( character, 1, 1, out );
