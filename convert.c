@@ -10,10 +10,10 @@ int binToDec(char *binary) {
     return output;
 }
 
-char *DectoBin( short decimal) {
-    char *binary = malloc( 8 *sizeof(binary));
+char *DectoBin( short decimal, int bitnumber) {
+    char *binary = malloc( bitnumber *sizeof(binary));
     while ( decimal > 0)
-    for( int i= 7; i >= 0; i--) {
+    for( int i= bitnumber - 1; i >= 0; i--) {
         if (decimal > 0) {
         binary[i] = (decimal%2 + 48);
         decimal /= 2;
