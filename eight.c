@@ -255,5 +255,7 @@ int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *
              
             pointer = pointer->parent;
         }
+        free(character);
+        free(characterBinary);
         return buforLength;
     }

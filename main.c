@@ -291,6 +291,8 @@ int main( int argc, char **argv) {
     free(charcounter);
     free(freq);
     free(arr);
+    free(bufordic);
+    free(remainingchar);
     fclose(out);
     fclose(in);
     
