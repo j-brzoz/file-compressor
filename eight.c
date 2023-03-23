@@ -101,7 +101,7 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     free( characterBinary );
 }
 
-int eightdictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
+int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
         char *character = malloc( sizeof *character );
         char *characterBinary = malloc( 8 * sizeof *characterBinary );
         node *tmp = pointer;
@@ -250,7 +250,7 @@ int eightdictionary( node *pointer, node *border, node *root, node *last, FILE *
                         }
                         buforLength -= 8;
                     }
-                    buforLength = eightdictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
+                    buforLength = eightDictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
                 }
             }
              

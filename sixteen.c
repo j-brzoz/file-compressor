@@ -200,7 +200,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     }
 }
 
-int sixteendictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
+int sixteenDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
         char *character = malloc( sizeof *character );
         char *characterBinary = malloc( 8 * sizeof *characterBinary );
         node *tmp = pointer;
@@ -349,7 +349,7 @@ int sixteendictionary( node *pointer, node *border, node *root, node *last, FILE
                         }
                         buforLength -= 8;
                     }
-                    buforLength = sixteendictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
+                    buforLength = sixteenDictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
                 }
             }
              

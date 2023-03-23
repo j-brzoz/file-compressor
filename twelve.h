@@ -7,4 +7,6 @@ int twelveAnalyzeInput(int inputBuforLength, char* inputBufor, FILE* in, int* ch
 
 void twelveOutputGenerator(int inputBuforLength, char* inputBufor, FILE* in, unsigned short input, char* bufor, int buforLength, char* character, char* characterBinary, int size, unsigned short** codes, FILE *out);
 
+int twelveDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor);
+
 #endif

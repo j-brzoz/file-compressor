@@ -156,6 +156,8 @@ int main( int argc, char **argv) {
     // output file
     FILE *out = fopen( "output.huff", "wb+");
 
+    int remaininglen = 0;
+    char *remainingchar;
     node *dicpoint;
     dicpoint = queue[queueSize - 1];
     node *tmp2 = dicpoint;
@@ -164,9 +166,9 @@ int main( int argc, char **argv) {
     }
     char *bufordic = malloc( 16384 * sizeof *bufordic );
     if ( atof(argv[2]) == 1) {
-        int remaininglen = eightdictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        remaininglen = eightDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
-            char *remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
                 printf("%c", remainingchar[i]);
@@ -174,9 +176,9 @@ int main( int argc, char **argv) {
         }
     }
     else if ( atof(argv[2]) == 2) {
-        int remaininglen = twelvedictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        remaininglen = twelveDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
-            char *remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
                 printf("%c", remainingchar[i]);
@@ -184,9 +186,9 @@ int main( int argc, char **argv) {
         }
     }
     else if ( atof(argv[2]) == 3) {
-        int remaininglen = sixteendictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        remaininglen = sixteenDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
-            char *remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
                 printf("%c", remainingchar[i]);

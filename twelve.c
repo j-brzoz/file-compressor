@@ -232,7 +232,7 @@ void twelveOutputGenerator(int inputBuforLength, char* inputBufor, FILE* in, uns
     }
 }
 
-int twelvedictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
+int twelveDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
         char *character = malloc( sizeof *character );
         char *characterBinary = malloc( 8 * sizeof *characterBinary );
         node *tmp = pointer;
@@ -381,7 +381,7 @@ int twelvedictionary( node *pointer, node *border, node *root, node *last, FILE 
                         }
                         buforLength -= 8;
                     }
-                    buforLength = twelvedictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
+                    buforLength = twelveDictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
                 }
             }
              
