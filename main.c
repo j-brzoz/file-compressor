@@ -32,6 +32,7 @@ int main( int argc, char **argv) {
 
     char *outputFile = NULL;
     char *inputFile = NULL;
+     char *inputPassword = NULL;
     
     int c;
     while ((c = getopt (argc, argv, "123x:z:c:vho:")) != -1)
@@ -57,7 +58,7 @@ int main( int argc, char **argv) {
             return EXIT_FAILURE;
         case 'c':       // encrypt output data
             // input password from the user
-            char *inputPassword = optarg;
+            inputPassword = optarg;
 
             // xor every char
             password = inputPassword[0];
