@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 #include "node.h"
 #include "sort.h"
 #include "queue.h"
@@ -10,54 +11,112 @@
 #include "sixteen.h"
 
 int main( int argc, char **argv) {
-    
-    // check if file and compression rate have been given
-    if( argc < 3 ) {
-        fprintf( stderr, "Lack of arguments!");
-        return EXIT_FAILURE;
-    }
 
-    // check if file exists
-    FILE *in = fopen( argv[1], "r");
-    if( in == NULL) {
-        fprintf( stderr, "This file doesn't exist!");
-        return EXIT_FAILURE;
-    }
-
-    // check if given compression rate is correct
-    int compressionRate = atoi(argv[2]);
-    
     // amount of bytes that we will read as one char
-    int inputSize;
-
-    // assign size according to compression rate
-    if(compressionRate == 1)
-        inputSize = 8;
-    else if(compressionRate == 2)
-        inputSize = 12;
-    else if(compressionRate == 3)
-        inputSize = 16;
-    else {
-        fprintf( stderr, "Wrong compression rate! Available rates: 1 or 2 or 3");
-        return EXIT_FAILURE;
-    }
+    int inputSize = 0;
 
     // default password for data encrypting (doesn't change anything)
     char password = 0;
 
-    // if password was given by the user
-    if( argc >= 4) {
-        
-        // input password from the user
-        char *inputPassword = argv[3];
+    // mandatory options
+    int checkCompRate = 0;
+    int checkInput = 0;
+    int checkOutput = 0;
 
-        // xor every char
-        password = inputPassword[0];
-        for(int i = 1; i < strlen(inputPassword); i++){
-            password = password ^ inputPassword[i];
-        }
+    // input and outour files
+    FILE *in;
+    FILE *out;
+
+    char *outputFile = NULL;
+    char *inputFile = NULL;
+    
+    int c;
+    while ((c = getopt (argc, argv, "123x:z:c:vho:")) != -1)
+    switch (c) {
+        case '1':       // compress 8 bit characters 
+            inputSize = 8;
+            checkCompRate++;
+            break;
+        case '2':       // compress 12 bit characters
+            inputSize = 12;
+            checkCompRate++;
+            break;
+        case '3':       // compress 16 bit characters
+            inputSize = 16;
+            checkCompRate++;
+            break;
+        case 'x':       // compress file
+            inputFile = optarg;
+            checkInput++;
+            break;
+        case 'z':       // decompress file
+            fprintf( stderr, "Feature has not been implemented yet!");
+            return EXIT_FAILURE;
+        case 'c':       // encrypt output data
+            // input password from the user
+            char *inputPassword = optarg;
+
+            // xor every char
+            password = inputPassword[0];
+            for(int i = 1; i < strlen(inputPassword); i++){
+                password = password ^ inputPassword[i]; 
+            }
+            break;
+        case 'v':       // give additional information
+            fprintf( stderr, "Feature has not been implemented yet!");
+            return EXIT_FAILURE;
+        case 'h':       // print help
+            fprintf( stderr, "Feature has not been implemented yet!");
+            return EXIT_FAILURE;
+        case 'o':       // output file
+            outputFile = optarg;
+            checkOutput++;
+            break;
+        case '?':
+            if (optopt == 'x' || optopt == 'z' || optopt == 'c' || optopt == 'o')
+                fprintf (stderr, "Options '-x', '-z', '-c', '-o', require arguments.\n");
+            else 
+                fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+            return EXIT_FAILURE;
+        default:
+            abort ();
+    }
+    int nonOption = 0;
+    for (int i = optind; i < argc; i++){
+       printf ("Non-option argument %s\n", argv[i]);
+        nonOption++;
+    }
+    if(nonOption > 0){
+        return 1;
+    }    
+
+    if( checkCompRate > 1 ) {
+        fprintf (stderr, "You can chose only one compression rate! ('-1' or '-2' or '-3')!\n");
+        return EXIT_FAILURE;
     }
 
+    if( checkInput > 1 ) {
+        fprintf (stderr, "You can chose only one input file!\n");
+        return EXIT_FAILURE;
+    }
+
+    if( checkOutput > 1 ) {
+        fprintf (stderr, "You can chose only one output file!\n");
+        return EXIT_FAILURE;
+    }
+
+    in = fopen( inputFile, "r");
+    if( in == NULL) {
+        fprintf( stderr, "The input file \"%s\" doesn't exist!", inputFile);
+        return EXIT_FAILURE;
+    }
+
+    if( checkCompRate == 0 || checkInput == 0 || checkOutput == 0 ) {
+        fprintf (stderr, "Options ('-x' or '-z') , '-o', ('-1' or '-2' or '-3'), are required!\n");
+        return EXIT_FAILURE;
+    }
+    
+    out = fopen( outputFile, "wb+");     
 
     // number of unique chars
     int uniqueCounter = 0;
@@ -159,8 +218,7 @@ int main( int argc, char **argv) {
     //     printf("\n");
     // }
 
-    // output file
-    FILE *out = fopen( "output.huff", "wb+");
+    
 
     //rewind the input file
     rewind(in);
