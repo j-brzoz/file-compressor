@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 int binToDec(char *binary) {
     int power = 1;
     int output = 0;
@@ -6,4 +8,18 @@ int binToDec(char *binary) {
         power *= 2;
     }
     return output;
+}
+
+char *DectoBin( short decimal, int bitnumber) {
+    char *binary = malloc( bitnumber *sizeof(binary));
+    while ( decimal > 0)
+    for( int i= bitnumber - 1; i >= 0; i--) {
+        if (decimal > 0) {
+        binary[i] = (decimal%2 + 48);
+        decimal /= 2;
+        } else {
+            binary[i] = 48;
+        } 
+    }
+    return binary;
 }

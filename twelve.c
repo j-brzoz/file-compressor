@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <stdlib.h>
 #include "convert.h"
+#include "node.h"
 
 int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     // for character conversion from binary to decimal 
@@ -294,3 +296,163 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
     free( characterBinary );
     free( bufor );
 }
+
+int twelveDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
+        char *character = malloc( sizeof *character );
+        char *characterBinary = malloc( 8 * sizeof *characterBinary );
+        node *tmp = pointer;
+        while( pointer->left != NULL) {
+            pointer = pointer->left;
+        }
+        if( tmp == root) {
+            char *chartmp = DectoBin( *(pointer->value), 12);
+            for( int j=0; j < 12; j++) {
+                bufor[buforLength] = chartmp[j];
+                buforLength++;
+            }
+            free(chartmp);
+        }
+        else {
+            //fprintf( stdout, "01");
+            bufor[buforLength ] = '0';
+            bufor[buforLength + 1] = '1';
+            buforLength += 2;
+            //fprintf( stdout, "%c", *(pointer->value));
+            char *chartmp = DectoBin( (*pointer->value), 12);
+            for( int j=0; j < 12; j++) {
+                bufor[buforLength] = chartmp[j];
+                buforLength++;
+            }
+            free(chartmp);
+            // if enough bits in bufor
+            while( buforLength >= 8 ) {
+        
+                // get code from bufor
+                for(int i = 0; i < 8; i++) {
+                    characterBinary[i] = bufor[i];
+                    fprintf( stdout, "%c", bufor[i]);
+                    
+                }
+                // convert code to char
+                character[0] = binToDec( characterBinary );
+                
+                // write character
+                fwrite( character, sizeof(char), 1, out );
+                
+                // move codes in bufor
+                for( int i = 0; i < buforLength - 8; i++ ) {
+                    bufor[i] = bufor[i + 8];
+                }
+                buforLength -= 8;
+            }
+        }
+        
+        while (pointer->parent != border) {
+            if (  pointer->parent->right != NULL) {
+                if ( pointer->parent->right->value != NULL) {
+                    if( pointer->parent->right != last) {
+                        //fprintf( stdout, "01");
+                        bufor[buforLength ] = '0';
+                        bufor[buforLength + 1] = '1';
+                        buforLength += 2;
+                        //fprintf( stdout, "%c", *(pointer->parent->right->value));
+                        char *chartmp = DectoBin( (*pointer->parent->right->value), 12 );
+                        for( int j=0; j < 12; j++) {
+                            bufor[buforLength] = chartmp[j];
+                            buforLength++;
+                        }
+                        free(chartmp);
+                        // if enough bits in bufor
+                        while( buforLength >= 8 ) {
+                    
+                            // get code from bufor
+                            for(int i = 0; i < 8; i++) {
+                                characterBinary[i] = bufor[i];
+                                fprintf( stdout, "%c", bufor[i]);
+                                
+                            }
+                            // convert code to char
+                            character[0] = binToDec( characterBinary );
+                            
+                            // write character
+                            fwrite( character, sizeof(char), 1, out );
+                            
+                            // move codes in bufor
+                            for( int i = 0; i < buforLength - 8; i++ ) {
+                                bufor[i] = bufor[i + 8];
+                            }
+                            buforLength -= 8;
+                        }
+                    }
+                    else {
+                         //fprintf( stdout, "11");
+                        bufor[buforLength ] = '1';
+                        bufor[buforLength + 1] = '1';
+                        buforLength += 2;
+                        //fprintf( stdout, "%c", *(pointer->parent->right->value));
+                        char *chartmp = DectoBin( *(pointer->parent->right->value), 12 );
+                        for( int j=0; j < 12; j++) {
+                            bufor[buforLength] = chartmp[j];
+                            buforLength++;
+                            //printf("%c", chartmp[j]);
+                        }
+                        free(chartmp);
+                        // if enough bits in bufor
+                        while( buforLength >= 8 ) {
+                    
+                            // get code from bufor
+                            for(int i = 0; i < 8; i++) {
+                                characterBinary[i] = bufor[i];
+                                fprintf( stdout, "%c", bufor[i]);
+                                
+                            }
+                            // convert code to char
+                            character[0] = binToDec( characterBinary );
+                            
+                            // write character
+                            fwrite( character, sizeof(char), 1, out );
+                            
+                            // move codes in bufor
+                            for( int i = 0; i < buforLength - 8; i++ ) {
+                                bufor[i] = bufor[i + 8];
+                            }
+                            buforLength -= 8;
+                        }
+                    }
+                }
+                else  {
+                    //fprintf( stdout, "00");
+                    bufor[buforLength ] = '0';
+                    bufor[buforLength + 1] = '0';
+                    buforLength += 2;
+                    // if enough bits in bufor
+                    while( buforLength >= 8 ) {
+                
+                        // get code from bufor
+                        for(int i = 0; i < 8; i++) {
+                            characterBinary[i] = bufor[i];
+                            fprintf( stdout, "%c", bufor[i]);
+                            
+                        }
+                        // convert code to char
+                        character[0] = binToDec( characterBinary );
+                        
+                        // write character
+                        fwrite( character, sizeof(char), 1, out );
+                        
+                        // move codes in bufor
+                        for( int i = 0; i < buforLength - 8; i++ ) {
+                            bufor[i] = bufor[i + 8];
+                        }
+                        buforLength -= 8;
+                    }
+                    buforLength = twelveDictionary( pointer->parent->right, pointer->parent, root, last, out, buforLength, bufor);
+                }
+            }
+             
+            pointer = pointer->parent;
+        }
+        free(character);
+        free(characterBinary);
+        return buforLength;
+    }

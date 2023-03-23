@@ -7,4 +7,6 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniquecounter );
 
 void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password );
 
+int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor);
+
 #endif

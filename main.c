@@ -9,6 +9,9 @@
 #include "eight.h"
 #include "twelve.h"
 #include "sixteen.h"
+#include "convert.h"
+
+
 
 int main( int argc, char **argv) {
 
@@ -185,7 +188,7 @@ int main( int argc, char **argv) {
 
     // put inputs in a queue
     for(int i = 0; i < uniqueCounter; i++){
-        node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL);
+        node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL, NULL);
         if(tmpNode == NULL){
             return 1;
         }
@@ -206,7 +209,7 @@ int main( int argc, char **argv) {
     // temporary array for reading codes
     unsigned short tmp[uniqueCounter - 1];
 
-    // read codes from tree
+    // read codes from treeh
     readCodes(queue[queueSize-1], uniqueCounter, codes, tmp, 0);
 
     // print codes
@@ -219,6 +222,47 @@ int main( int argc, char **argv) {
     // }
 
     
+
+    int remaininglen = 0;
+    char *remainingchar;
+    node *dicpoint;
+    dicpoint = queue[queueSize - 1];
+    node *tmp2 = dicpoint;
+    while ( tmp2->right != NULL) {
+        tmp2 = tmp2->right;
+    }
+    char *bufordic = malloc( 16384 * sizeof *bufordic );
+    if ( atof(argv[2]) == 1) {
+        remaininglen = eightDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        if( remaininglen != 0) {
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            for ( int i= 0; i < remaininglen; i++) {
+                remainingchar[i] = bufordic[i];
+                printf("%c", remainingchar[i]);
+            }
+        }
+    }
+    else if ( atof(argv[2]) == 2) {
+        remaininglen = twelveDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        if( remaininglen != 0) {
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            for ( int i= 0; i < remaininglen; i++) {
+                remainingchar[i] = bufordic[i];
+                printf("%c", remainingchar[i]);
+            }
+        }
+    }
+    else if ( atof(argv[2]) == 3) {
+        remaininglen = sixteenDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
+        if( remaininglen != 0) {
+            remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
+            for ( int i= 0; i < remaininglen; i++) {
+                remainingchar[i] = bufordic[i];
+                printf("%c", remainingchar[i]);
+            }
+        }
+    }
+    printf("\n");
 
     //rewind the input file
     rewind(in);
