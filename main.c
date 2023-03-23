@@ -232,7 +232,7 @@ int main( int argc, char **argv) {
         tmp2 = tmp2->right;
     }
     char *bufordic = malloc( 16384 * sizeof *bufordic );
-    if ( atof(argv[2]) == 1) {
+    if ( inputSize == 8) {
         remaininglen = eightDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
@@ -242,7 +242,7 @@ int main( int argc, char **argv) {
             }
         }
     }
-    else if ( atof(argv[2]) == 2) {
+    else if ( inputSize == 12) {
         remaininglen = twelveDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
@@ -252,7 +252,7 @@ int main( int argc, char **argv) {
             }
         }
     }
-    else if ( atof(argv[2]) == 3) {
+    else if ( inputSize == 16) {
         remaininglen = sixteenDictionary( dicpoint, NULL, queue[queueSize - 1], tmp2, out, 0, bufordic );
         if( remaininglen != 0) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
