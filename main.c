@@ -32,7 +32,7 @@ int main( int argc, char **argv) {
 
     char *outputFile = NULL;
     char *inputFile = NULL;
-     char *inputPassword = NULL;
+    char *inputPassword = NULL;
     
     int c;
     while ((c = getopt (argc, argv, "123x:z:c:vho:")) != -1)
@@ -270,14 +270,11 @@ int main( int argc, char **argv) {
 
     // generate output
     if(inputSize == 8)
-        eightOutputGenerator(in, uniqueCounter, codes, out, password);
+        eightOutputGenerator(in, uniqueCounter, codes, out, password, remainingchar, remaininglen);
     else if(inputSize == 16)
-        sixteenOutputGenerator(in, uniqueCounter, codes, out, password);
+        sixteenOutputGenerator(in, uniqueCounter, codes, out, password, remainingchar, remaininglen);
     else if(inputSize == 12)
-        twelveOutputGenerator(in, uniqueCounter, codes, out, password);
-
-    // check message
-    printf("everything went well!\n");
+        twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingchar, remaininglen);
 
     // free memory
     for(int i = 0; i < queueSize; i++)
@@ -291,11 +288,19 @@ int main( int argc, char **argv) {
     free(codes);
     free(charcounter);
     free(freq);
+    
     free(arr);
     free(bufordic);
-    free(remainingchar);
+
+    if(remaininglen != 0)
+        free(remainingchar);
+
     fclose(out);
     fclose(in);
+    // check message
+    printf("everything went well!\n");
+
+    
     
     return 0;
 }

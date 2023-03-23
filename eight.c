@@ -25,7 +25,7 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;       
 }
 
-void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password ) {
+void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen ) {
     
     // char read from the file
     char c;
@@ -37,6 +37,12 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
+
+    // add remaining chars from dictionary
+    for(int i = 0; i < remainingLen; i++){
+        bufor[i] = remainingChar[i];
+    }
+    buforLength += remainingLen;
 
     // get chararcter
     while ( ( c = fgetc( in ) ) != EOF ) {

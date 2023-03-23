@@ -72,7 +72,7 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;
 }
 
-void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password ) {
+void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
@@ -90,6 +90,12 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
+
+    // add remaining chars from dictionary
+    for(int i = 0; i < remainingLen; i++){
+        bufor[i] = remainingChar[i];
+    }
+    buforLength += remainingLen;
 
     // get two bytes
     while( inputBuforLength = fread( inputBufor, 1, 2, in ) ) {
