@@ -222,7 +222,11 @@ int main( int argc, char **argv) {
     //     printf("\n");
     // }
 
-    
+    // place for header
+    char character[1];
+    character[0] = '0';
+    fwrite( character, 1, 1, out );
+    fwrite( character, 1, 1, out );
 
     int remaininglen = 0;
     char *remainingchar;

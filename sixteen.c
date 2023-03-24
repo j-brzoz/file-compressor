@@ -3,6 +3,7 @@
 #include <math.h>
 #include "convert.h"
 #include "node.h"
+#include "fileHeader.h"
 
 int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     // for character conversion from binary to decimal 
@@ -90,6 +91,10 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
+    // crc
+    char crc = 'J';
+    // count how many zeros we add artficially
+    int zeroCounter = 0;
 
     // add remaining chars from dictionary
     for(int i = 0; i < remainingLen; i++){
@@ -132,6 +137,8 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
             
             // convert code to char
             character[0] = binToDec( characterBinary ) ^ password;
+
+            crc = crc ^ binToDec( characterBinary );
             
             // write character
             fwrite( character, 1, 1, out );
@@ -175,6 +182,8 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
             // convert code to char
             character[0] = binToDec(characterBinary) ^ password;
 
+            crc = crc ^ binToDec( characterBinary );
+
             // write character
             fwrite(character, 1, 1, out);
             
@@ -196,14 +205,20 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
         // level up to 8 bits
         for(int i = buforLength; i < 8; i++) {
                 characterBinary[i] = '0';
+                zeroCounter++;
         }
         
         // convert code to char
         character[0] = binToDec(characterBinary) ^ password;
         
+        crc = crc ^ binToDec( characterBinary );
+    
         // write character
         fwrite(character, 1, 1, out);
     }
+
+    header(out, 16, password, zeroCounter, crc);
+
     free( inputBufor );
     free( character );
     free( characterBinary );
