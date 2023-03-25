@@ -156,6 +156,10 @@ int main( int argc, char **argv) {
     else if(inputSize == 12)
         uniqueCounter = twelveAnalyzeInput(in, charcounter, uniqueCounter);
 
+    // if there is one char in the file
+    if( uniqueCounter == 1 ) {
+        uniqueCounter++;
+    }
     // characters found in the input
     unsigned short *arr = malloc( uniqueCounter * sizeof *arr);
     // frequency of charcters from the input
@@ -169,7 +173,19 @@ int main( int argc, char **argv) {
             j++;
         }
     }
-   
+
+    // if there is one char in the file
+    if( uniqueCounter == 1 ) {
+        if( arr[0] != 'J' ) {
+            arr[1] = 'J';
+            freq[1] = 1;
+        }
+        else {
+            arr[1] = 'j';
+            freq[1] = 1;
+        }
+    }
+
     // size of the queue
     int queueSize = 2 * uniqueCounter - 1;
 
@@ -243,7 +259,7 @@ int main( int argc, char **argv) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
-                printf("%c", remainingchar[i]);
+                // printf("%c", remainingchar[i]);
             }
         }
     }
@@ -253,7 +269,7 @@ int main( int argc, char **argv) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
-                printf("%c", remainingchar[i]);
+                // printf("%c", remainingchar[i]);
             }
         }
     }
@@ -263,11 +279,11 @@ int main( int argc, char **argv) {
             remainingchar = malloc ( remaininglen * sizeof( remainingchar ));
             for ( int i= 0; i < remaininglen; i++) {
                 remainingchar[i] = bufordic[i];
-                printf("%c", remainingchar[i]);
+                // printf("%c", remainingchar[i]);
             }
         }
     }
-    printf("\n");
+    // printf("\n");
 
     //rewind the input file
     rewind(in);
@@ -301,10 +317,9 @@ int main( int argc, char **argv) {
 
     fclose(out);
     fclose(in);
-    // check message
-    printf("everything went well!\n");
 
-    
+    // check message
+    printf("everything went well!\n");   
     
     return 0;
 }

@@ -151,8 +151,7 @@ int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *
                 // get code from bufor
                 for(int i = 0; i < 8; i++) {
                     characterBinary[i] = bufor[i];
-                    fprintf( stdout, "%c", bufor[i]);
-                    
+                    // fprintf( stdout, "%c", bufor[i]);
                 }
                 // convert code to char
                 character[0] = binToDec( characterBinary );
@@ -189,8 +188,7 @@ int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *
                             // get code from bufor
                             for(int i = 0; i < 8; i++) {
                                 characterBinary[i] = bufor[i];
-                                fprintf( stdout, "%c", bufor[i]);
-                                
+                                // fprintf( stdout, "%c", bufor[i]);            
                             }
                             // convert code to char
                             character[0] = binToDec( characterBinary );
@@ -224,8 +222,7 @@ int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *
                             // get code from bufor
                             for(int i = 0; i < 8; i++) {
                                 characterBinary[i] = bufor[i];
-                                fprintf( stdout, "%c", bufor[i]);
-                                
+                                // fprintf( stdout, "%c", bufor[i]);
                             }
                             // convert code to char
                             character[0] = binToDec( characterBinary );
@@ -252,8 +249,7 @@ int eightDictionary( node *pointer, node *border, node *root, node *last, FILE *
                         // get code from bufor
                         for(int i = 0; i < 8; i++) {
                             characterBinary[i] = bufor[i];
-                            fprintf( stdout, "%c", bufor[i]);
-                            
+                            // fprintf( stdout, "%c", bufor[i]);
                         }
                         // convert code to char
                         character[0] = binToDec( characterBinary );
