@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "convert.h"
-#include "node.h"
-#include "fileHeader.h"
+#include "../tools/convert.h"
+#include "../queue/node.h"
+#include "../tools/fileHeader.h"
 
 int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     // for character conversion from binary to decimal 

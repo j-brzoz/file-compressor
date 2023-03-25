@@ -1,0 +1,2 @@
+comp: 
+	$(CC) src/main.c src/compRate/eight.c src/compRate/sixteen.c src/compRate/twelve.c src/queue/node.c src/queue/queue.c src/queue/sort.c src/tools/convert.c src/tools/fileHeader.c -o compressor -lm

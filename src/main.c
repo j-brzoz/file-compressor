@@ -3,13 +3,13 @@
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
-#include "node.h"
-#include "sort.h"
-#include "queue.h"
-#include "eight.h"
-#include "twelve.h"
-#include "sixteen.h"
-#include "convert.h"
+#include "./queue/node.h"
+#include "./queue/sort.h"
+#include "./queue/queue.h"
+#include "./compRate/eight.h"
+#include "./compRate/twelve.h"
+#include "./compRate/sixteen.h"
+#include "./tools/convert.h"
 
 
 
