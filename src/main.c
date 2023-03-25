@@ -12,7 +12,23 @@
 #include "./tools/convert.h"
 #include <time.h>
 
-
+char *helpString = 
+"To compress\n"
+"Usage: compressor -x input-file -o output-file -compress-rate [-c password -v -h]\n"
+"   -x input-file\n"
+"   -o output-file\n"
+"   -compress-rate  Available compression rates: -1 -2 -3\n"
+"   -c password \n"
+"   -v              verbose\n"
+"   -h              print usage\n"
+"To decompress\n"
+"Usage: compressor -z input-file -o output-file -compress-rate [-c [password] -v -h]\n"
+"   -z input-file\n"
+"   -o output-file\n"
+"   -compress-rate  Available compression rates: -1 -2 -3\n"
+"   -c password \n"
+"   -v              verbose\n"
+"   -h              print usage\n";
 
 int main( int argc, char **argv) {
 
@@ -74,8 +90,8 @@ int main( int argc, char **argv) {
             fprintf( stderr, "Feature has not been implemented yet!");
             return EXIT_FAILURE;
         case 'h':       // print help
-            fprintf( stderr, "Feature has not been implemented yet!");
-            return EXIT_FAILURE;
+            printf("%s", helpString);
+            break;
         case 'o':       // output file
             outputFile = optarg;
             checkOutput++;
