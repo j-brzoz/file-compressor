@@ -26,11 +26,11 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
             for( int i = 0; i < 1200; i += 2 ) {
                 
                 // make sure the input is correct
-                if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 && 
-                   ( unsigned short )inputBufor[i+1] >= 0 && ( unsigned short )inputBufor[i+1] <= 255 ) {
+                if( inputBufor[i] >= 0 && inputBufor[i] <= 255 && 
+                   inputBufor[i+1] >= 0 && inputBufor[i+1] <= 255 ) {
 
                     // convert two bytes to one decimal value
-                    input = pow( 2, 8 ) * ( unsigned short )inputBufor[i] + ( unsigned short )inputBufor[i+1];
+                    input = pow( 2, 8 ) * inputBufor[i] + inputBufor[i+1];
 
                     charcounter[input]++;
                     if (charcounter[input] == 1)
@@ -42,11 +42,11 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
         else {
             for( int i = 0; i < inputBuforLength - isOdd - 1; i += 2 ) {
                 // make sure the input is correct
-                if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 && 
-                    ( unsigned short )inputBufor[i+1] >= 0 && ( unsigned short )inputBufor[i+1] <= 255 ) {
+                if( inputBufor[i] >= 0 && inputBufor[i] <= 255 && 
+                    inputBufor[i+1] >= 0 && inputBufor[i+1] <= 255 ) {
                     
                     // convert two bytes to one decimal value
-                    input = pow( 2, 8 ) * ( unsigned short )inputBufor[i] + ( unsigned short )inputBufor[i+1];
+                    input = pow( 2, 8 ) * inputBufor[i] + inputBufor[i+1];
                     
                     charcounter[input]++;
                     if ( charcounter[input] == 1 )
@@ -58,10 +58,10 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
         // there was odd number of bytes 
         if( isOdd ) {
             // make sure the input is correct
-            if( ( unsigned short )inputBufor[inputBuforLength-1] >= 0 && ( unsigned short )inputBufor[inputBuforLength-1] <= 255 ) {
+            if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 ) {
 
                 // convert the byte to decimal value
-                input = ( unsigned short )inputBufor[inputBuforLength-1];
+                input = inputBufor[inputBuforLength-1];
 
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )

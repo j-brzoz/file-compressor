@@ -10,10 +10,14 @@
 #include "./compRate/twelve.h"
 #include "./compRate/sixteen.h"
 #include "./tools/convert.h"
+#include <time.h>
 
 
 
 int main( int argc, char **argv) {
+
+    clock_t t;
+    t = clock();
 
     // amount of bytes that we will read as one char
     int inputSize = 0;
@@ -109,7 +113,7 @@ int main( int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    in = fopen( inputFile, "r");
+    in = fopen( inputFile, "rb");
     if( in == NULL) {
         fprintf( stderr, "The input file \"%s\" doesn't exist!", inputFile);
         return EXIT_FAILURE;
@@ -214,12 +218,17 @@ int main( int argc, char **argv) {
     
     // sort inputs
     quickSortQueue(queue, 0, uniqueCounter - 1);
+
+    // printQueue(queue, uniqueCounter);
+
+    printf("U: %d\n", uniqueCounter);
     
     // make a binary tree
     int temp = 0;
     while(notFull(queue, queueSize)){
         addNewNodeToQueue(queue, queueSize);
         quickSortQueue(queue, 2*(temp+1), uniqueCounter + temp);
+        // printf("%d\n", temp);
         temp++;
     }
 
@@ -319,7 +328,13 @@ int main( int argc, char **argv) {
     fclose(in);
 
     // check message
-    printf("everything went well!\n");   
+    printf("everything went well!\n");
+
+    t = clock() - t;
+
+    double timeTaken = ((double)t)/CLOCKS_PER_SEC;
+
+    printf("time: %f\n", timeTaken);
     
     return 0;
 }

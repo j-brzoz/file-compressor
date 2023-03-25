@@ -7,7 +7,7 @@
 int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     
     // bufor for reading from input file
-    char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    unsigned short *inputBufor = malloc( 1200 * sizeof *inputBufor );
     // size of input bufor
     int inputBuforLength;
 
@@ -15,9 +15,9 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     while ( inputBuforLength = fread( inputBufor, 1, 1200, in ) ) {
         for( int i = 0; i < inputBuforLength; i++ ) {
             // make sure the input is correct
-            if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 ) {
-                charcounter[( unsigned short )inputBufor[i]]++;
-                if ( charcounter[( unsigned short )inputBufor[i]] == 1 )
+            if( inputBufor[i] >= 0 && inputBufor[i] <= 255 ) {
+                charcounter[inputBufor[i]]++;
+                if ( charcounter[inputBufor[i]] == 1 )
                     uniqueCounter++;
             }
         }
@@ -29,7 +29,7 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
 void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen ) {
     
     // char read from the file
-    char c;
+    char *c = malloc(sizeof *c);
     // charcter that will be put in the output file
     char* character = malloc( sizeof *character );
     // binary representation of charcter   
@@ -50,11 +50,11 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     buforLength += remainingLen;
 
     // get chararcter
-    while ( ( c = fgetc( in ) ) != EOF ) {
+    while ( fread( c, 1, 1, in ) ) {
             
         // find character in codes
         for( int i = 0; i < uniqueCounter; i++ ) {
-            if( c == codes[i][0] ) {
+            if( c[0] == codes[i][0] ) {
                 
                 // write code to bufor
                 for( int j = 0; j < codes[i][1]; j++ ) {

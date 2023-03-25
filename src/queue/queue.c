@@ -6,7 +6,7 @@
 void printQueue(node **queue, int n){
     for(int i = 0; i < n; i++){
         if(queue[i]->value != NULL){
-            printf("val: %c\n", *(queue[i]->value));
+            printf("val: %d\n", *(queue[i]->value));
         }
         printf("left: %p, right: %p\n", (queue[i]->left), (queue[i]->right));
         printf("freq: %d\n\n", queue[i]->freq);

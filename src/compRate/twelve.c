@@ -10,7 +10,7 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
-    char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
     // size of input bufor
     int inputBuforLength;
     // for getting relevant bites
@@ -31,20 +31,19 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
             for( int i = 0; i < 1200; i+=3 ) {
                 
                 // make sure the input is correct
-                if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 && 
-                   ( unsigned short )inputBufor[i+1] >= 0 && ( unsigned short )inputBufor[i+1] <= 255 && 
-                   ( unsigned short )inputBufor[i+2] >= 0 && ( unsigned short )inputBufor[i+2] <= 255 ) {
+                if( inputBufor[i] >= 0 && inputBufor[i] <= 255 && 
+                   inputBufor[i+1] >= 0 && inputBufor[i+1] <= 255 && 
+                   inputBufor[i+2] >= 0 && inputBufor[i+2] <= 255 ) {
                     
                     // convert 1 + 0,5 bytes to decimal
-                    input = ( unsigned short )pow( 2, 4 ) * ( unsigned short )inputBufor[i] + 
-                        ( ( ( unsigned short )( inputBufor[i+1] & mask1 ) ) / ( unsigned short )pow( 2, 4 ) );
+                    input = ( unsigned short )pow( 2, 4 ) * inputBufor[i] + 
+                        ( ( inputBufor[i+1] & mask1 ) / ( unsigned short )pow( 2, 4 ) );
                     charcounter[input]++;
                     if( charcounter[input] == 1 )
                         uniqueCounter++;
                 
                     // convert 0,5 + 1 bytes to decimal
-                    input = ( unsigned short )pow( 2, 8 ) * ( ( unsigned short )( inputBufor[i+1] & mask2 ) ) + 
-                        ( unsigned short )inputBufor[i+2];
+                    input = ( unsigned short )pow( 2, 8 ) * ( inputBufor[i+1] & mask2 ) + inputBufor[i+2];
                     charcounter[input]++;
                     if ( charcounter[input] == 1 )
                         uniqueCounter++;
@@ -56,20 +55,19 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
             for(int i = 0; i < inputBuforLength - remainder; i+=3){
                 
                 // make sure the input is correct
-                if( ( unsigned short )inputBufor[i] >= 0 && ( unsigned short )inputBufor[i] <= 255 && 
-                ( unsigned short )inputBufor[i+1] >= 0 && ( unsigned short )inputBufor[i+1] <= 255 && 
-                ( unsigned short )inputBufor[i+2] >= 0 && ( unsigned short )inputBufor[i+2] <= 255 ) {
+                if( inputBufor[i] >= 0 && inputBufor[i] <= 255 && 
+                inputBufor[i+1] >= 0 && inputBufor[i+1] <= 255 && 
+                inputBufor[i+2] >= 0 && inputBufor[i+2] <= 255 ) {
                     
                     // convert 1 + 0,5 bytes to decimal
-                    input = ( unsigned short )pow( 2, 4 ) * ( unsigned short )inputBufor[i] + 
-                        ( ( ( unsigned short )( inputBufor[i+1] & mask1 ) ) / ( unsigned short )pow( 2, 4 ));
+                    input = ( unsigned short )pow( 2, 4 ) * inputBufor[i] + 
+                        ( ( inputBufor[i+1] & mask1 ) / ( unsigned short )pow( 2, 4 ));
                     charcounter[input]++;
                     if ( charcounter[input] == 1 )
                         uniqueCounter++;
 
                     // convert 0,5 + 1 bytes to decimal
-                    input = ( unsigned short )pow( 2, 8 ) * ( ( unsigned short )( inputBufor[i+1] & mask2 ) ) + 
-                        ( unsigned short )inputBufor[i+2];
+                    input = ( unsigned short )pow( 2, 8 ) * ( inputBufor[i+1] & mask2 ) + inputBufor[i+2];
                     charcounter[input]++;
                     if( charcounter[input] == 1)
                         uniqueCounter++;
@@ -81,18 +79,18 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
         if( remainder == 2 ) {
             
             // convert 1 + 0,5 bytes to decimal
-            if( ( unsigned short )inputBufor[inputBuforLength-1] >= 0 && ( unsigned short )inputBufor[inputBuforLength-1] <= 255 && 
-                ( unsigned short )inputBufor[inputBuforLength-2] >= 0 && ( unsigned short )inputBufor[inputBuforLength-2] <= 255 ) {
+            if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 && 
+                inputBufor[inputBuforLength-2] >= 0 && inputBufor[inputBuforLength-2] <= 255 ) {
                 
                 // convert 1 + 0,5 bytes to decimal
-                input = ( unsigned short )pow( 2, 4 ) * ( unsigned short )inputBufor[inputBuforLength-2] + 
-                    ( ( ( unsigned short )( inputBufor[inputBuforLength-1] & mask1 ) ) / ( unsigned short )pow( 2, 4 ) );
+                input = ( unsigned short )pow( 2, 4 ) * inputBufor[inputBuforLength-2] + 
+                    ( ( inputBufor[inputBuforLength-1] & mask1 ) / ( unsigned short )pow( 2, 4 ) );
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
                     uniqueCounter++;
                 
                 // convert 0,5 byte to decimal
-                input =  ( ( unsigned short )( inputBufor[inputBuforLength-1] & mask2 ) );
+                input =  ( inputBufor[inputBuforLength-1] & mask2 );
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
                     uniqueCounter++;
@@ -101,10 +99,10 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
         else if(remainder == 1) {
 
             // make sure the input is correct
-            if( ( unsigned short )inputBufor[inputBuforLength-1] >= 0 && ( unsigned short )inputBufor[inputBuforLength-1] <= 255 ) {
+            if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 ) {
                 
                 // convert 1 byte to decimal
-                input = ( unsigned short )inputBufor[inputBuforLength-1];
+                input = inputBufor[inputBuforLength-1];
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
                     uniqueCounter++;
