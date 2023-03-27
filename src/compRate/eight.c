@@ -7,12 +7,12 @@
 int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     
     // bufor for reading from input file
-    unsigned short *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
     // size of input bufor
     int inputBuforLength;
 
     // read 1200 bytes
-    while ( inputBuforLength = fread( inputBufor, 1, 1200, in ) ) {
+    while ( inputBuforLength = fread( inputBufor, sizeof*inputBufor, 1200, in ) ) {
         for( int i = 0; i < inputBuforLength; i++ ) {
             // make sure the input is correct
             if( inputBufor[i] >= 0 && inputBufor[i] <= 255 ) {
