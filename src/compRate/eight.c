@@ -29,17 +29,17 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
 void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen ) {
     
     // char read from the file
-    char *c = malloc(sizeof *c);
+    unsigned char *c = malloc(sizeof *c);
     // charcter that will be put in the output file
-    char* character = malloc( sizeof *character );
+    unsigned char* character = malloc( sizeof *character );
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
     // bufor with codes from characters found in the input
-    char *bufor = malloc( 16384 * sizeof *bufor );
+    unsigned char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
     // crc
-    char crc = 'J';
+    unsigned char crc = 'J';
     // count how many zeros we add artficially
     int zeroCounter = 0;
 
@@ -139,9 +139,9 @@ int eightDictionary(node *pointer, node *border, node *root, node *last, FILE *o
     else
     {
         // fprintf( stdout, "01");
-        bufor[buforLength] = '0';
-        bufor[buforLength + 1] = '1';
-        buforLength += 2;
+        // bufor[buforLength] = '0';
+        // bufor[buforLength + 1] = '1';
+        // buforLength += 2;
         // fprintf( stdout, "%c", *(pointer->value));
         char *chartmp = DectoBin((*pointer->value), 8);
         for (int j = 0; j < 8; j++)
@@ -299,7 +299,7 @@ int eightDictionary(node *pointer, node *border, node *root, node *last, FILE *o
     return buforLength;
 }
 
-node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charzero, unsigned short *character, int charlen) {
+node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charzero, unsigned short *character, int charlen, int *uniqueCounter) {
 
     unsigned char c;
     char *characterBinary = malloc(8 * sizeof *characterBinary);
@@ -310,6 +310,7 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
     if (charzero != NULL)
     {
         pointerlast = makeNode(charzero, 0, NULL, NULL, NULL, NULL);
+        uniqueCounter[0]++;
     }
 
     while ((c = fgetc(in)) != EOF)
@@ -338,6 +339,7 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
                 character[charlen] = binToDec(characterBinary);
 
                 pointerlast = makeNode(&character[charlen], 0, NULL, NULL, NULL, NULL);
+                uniqueCounter[0]++;
 
                 for (int i = 0; i < buforLength - 8; i++)
                 {
@@ -365,7 +367,9 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
             if (operation[0] == '0' && operation[1] == '1')
             {
                 pointernew = makeNode(&character[charlen], 0, NULL, NULL, NULL, NULL);
+                uniqueCounter[0]++;
                 pointernew->parent = makeNode(NULL, 0, NULL, pointerlast, pointernew, NULL);
+                uniqueCounter[0]++;
                 pointerlast->parent = pointernew->parent;
                 pointerlast = pointernew->parent;
                 pointernew = NULL;
@@ -385,8 +389,9 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
                 }
                 buforLength -= 10;
 
-                pointernew = readDicEight(in, bufor, buforLength, &character[charlen], character, charlen);
+                pointernew = readDicEight(in, bufor, buforLength, &character[charlen], character, charlen, uniqueCounter);
                 pointerlast->parent = makeNode(NULL, 0, NULL, pointerlast, pointernew, NULL);
+                uniqueCounter[0]++;
                 pointernew->parent = pointerlast->parent;
                 pointerlast = pointerlast->parent;
                 goto stop;
@@ -394,7 +399,9 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
             else if (operation[0] == '1' && operation[1] == '1')
             {
                 pointernew = makeNode(&character[charlen], 0, NULL, NULL, NULL, NULL);
+                uniqueCounter[0]++;
                 pointernew->parent = makeNode(NULL, 0, NULL, pointerlast, pointernew, NULL);
+                uniqueCounter[0]++;
                 pointerlast->parent = pointernew->parent;
                 pointerlast = pointernew->parent;
                
@@ -402,7 +409,7 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
             }
             else
             {
-                fprintf(stderr, "Something went wrong");
+                fprintf(stderr, "Something went wrong\n");
                 goto stop;
             }
         }
