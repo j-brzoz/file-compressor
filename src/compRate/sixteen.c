@@ -9,7 +9,7 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
-    char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
     // size of input bufor
     int inputBuforLength;
     // to check if number of bytes is odd 
@@ -77,22 +77,22 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
-    char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
     // size of input bufor
     int inputBuforLength;
     // to check if number of bytes is odd 
     int isOdd;
     // charcter that will be put in the output file
-    char* character = malloc( sizeof *character );
+    unsigned char* character = malloc( sizeof *character );
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
     characterBinary[0] = 0;
     // bufor with codes from characters found in the input
-    char *bufor = malloc( 16384 * sizeof *bufor );
+    unsigned char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
     // crc
-    char crc = 'J';
+    unsigned char crc = 'J';
     // count how many zeros we add artficially
     int zeroCounter = 0;
 
