@@ -2,6 +2,6 @@
 #define CONVERT_H
 
 int binToDec(char *binary);
-char *DectoBin( int decimal, int bitnumber);
+char *DectoBin( unsigned short decimal, int bitnumber);
 
 #endif
