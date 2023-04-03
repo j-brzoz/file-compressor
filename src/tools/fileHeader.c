@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "convert.h"
 
-void header(FILE *out, int inputSize, char password, int zeroCounter, char crc){
+void header(FILE *out, int inputSize, int isOdd, int zeroCounter, char crc){
     // charcter that will be put in the output file
     char* character = malloc( sizeof *character );
     // binary representation of charcter   
@@ -24,7 +24,7 @@ void header(FILE *out, int inputSize, char password, int zeroCounter, char crc){
         characterBinary[3] = '1';
     }
 
-    if(password == 0){
+    if(isOdd == 0){
         characterBinary[4] = '0';
     }
     else {
@@ -86,4 +86,7 @@ void header(FILE *out, int inputSize, char password, int zeroCounter, char crc){
     // write crc as second byte
     character[0] = crc;
     fwrite( character, 1, 1, out );
+
+    free(character);
+    free(characterBinary);
 }
