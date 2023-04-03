@@ -48,19 +48,28 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
             bufor[j+buforLength] = value[j];
         }
         buforLength += inputSize;
-
+        
+        free(value);
         value = DectoBin(codes[i][1], 8);
+        
         for(int j = 0; j < 8; j++){
             bufor[j+buforLength] = value[j];
         }
         buforLength += 8;
         
+        free(value);
+
         for(int j = 0; j < codes[i][1]; j++){
             bufor[j+buforLength] = codes[i][j+2];
         }
         buforLength += codes[i][1];
 
         while( buforLength >= 8 ) {
+
+            // printf("bufor: ");
+            // for(int k = 0; k < buforLength; k++)
+            //     printf("%c", bufor[k]);
+            // printf("\n");
         
             // get code from bufor
             for(int j = 0; j < 8; j++) {
@@ -69,6 +78,8 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
             
             // convert code to char
             byte[0] = binToDec( byteBin );
+
+            // printf("char: %d\n", byte[0]);
             
             // write character
             fwrite( byte, 1, 1, out );
@@ -80,9 +91,11 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
             buforLength -= 8;
         }
     }
+    // char ala[3];
+    // ala[0] = 'a'; ala[1] = 'l'; ala[2] = 'a';
+    // fwrite(ala, 1, 3, out);
 
     free(byteBin);
-    free(value);
 
     return buforLength;
 }
