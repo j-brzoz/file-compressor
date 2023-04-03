@@ -61,7 +61,7 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
             if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 ) {
 
                 // convert the byte to decimal value
-                input = inputBufor[inputBuforLength-1];
+                input = inputBufor[inputBuforLength-1] * 256;
 
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
@@ -156,7 +156,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     if( isOdd ){
         
         // convert the byte to decimal value
-        input = ( unsigned short )inputBufor[0];
+        input = ( unsigned short )inputBufor[0] * 256;
 
         // find character in codes
         for( int k = 0; k < uniqueCounter; k++ ) {
@@ -217,7 +217,7 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
         fwrite(character, 1, 1, out);
     }
 
-    header(out, 16, password, zeroCounter, crc);
+    header(out, 16, isOdd, zeroCounter, crc);
 
     free( inputBufor );
     free( character );
