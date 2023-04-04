@@ -9,3 +9,8 @@
 8. Informacje.
 9.  Help.
 10. Getopt.
+hexeditor
+inna nazwa pliku wyjsciowego i wejsciowego
+makefile testy
+optymalizacja
+zmiana nagwka
