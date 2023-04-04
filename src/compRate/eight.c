@@ -111,8 +111,9 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
         fwrite( character, 1, 1, out );
     }
 
-    header(out, 8, password, zeroCounter, crc);
+    header(out, 8, 0, 0, zeroCounter, crc);
 
+    free(c);
     free( bufor );
     free( character );
     free( characterBinary );

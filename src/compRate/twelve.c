@@ -78,7 +78,7 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
         // if remainder is not equal to zero
         if( remainder == 2 ) {
             
-            // convert 1 + 0,5 bytes to decimal
+            // make sure the input is correct
             if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 && 
                 inputBufor[inputBuforLength-2] >= 0 && inputBufor[inputBuforLength-2] <= 255 ) {
                 
@@ -90,7 +90,7 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
                     uniqueCounter++;
                 
                 // convert 0,5 byte to decimal
-                input =  ( inputBufor[inputBuforLength-1] & mask2 );
+                input =  ( inputBufor[inputBuforLength-1] & mask2 ) * 256;
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
                     uniqueCounter++;
@@ -102,7 +102,7 @@ int twelveAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
             if( inputBufor[inputBuforLength-1] >= 0 && inputBufor[inputBuforLength-1] <= 255 ) {
                 
                 // convert 1 byte to decimal
-                input = inputBufor[inputBuforLength-1];
+                input = inputBufor[inputBuforLength-1] * 16;
                 charcounter[input]++;
                 if ( charcounter[input] == 1 )
                     uniqueCounter++;
@@ -231,7 +231,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
         }
 
         // convert 0,5 byte to decimal
-        input =  ( ( unsigned short )( inputBufor[1] & mask2 ) );
+        input =  ( ( unsigned short )( inputBufor[1] & mask2 ) * 256);
 
         // find value in codes
         for( int k = 0; k < uniqueCounter; k++ ) {
@@ -248,7 +248,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
     else if( remainder == 1 ){
         
         // convert 1 byte to decimal
-        input = ( unsigned short )inputBufor[0];
+        input = ( unsigned short )inputBufor[0] * 16;
         
         // find value in codes
         for( int k = 0; k < uniqueCounter; k++ ) {
@@ -308,7 +308,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
         fwrite( character, 1, 1, out );
     }
 
-    header(out, 12, password, zeroCounter, crc);
+    header(out, 12, 0, remainder, zeroCounter, crc);
 
     free( inputBufor );
     free( character );
