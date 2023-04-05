@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "convert.h"
 
-void header(FILE *out, int inputSize, int isOdd, int remainder, int zeroCounter, char crc){
+void header(FILE *out, int inputSize, int isOdd, int remainder, int zeroCounter, unsigned char crc){
     // charcter that will be put in the output file
     char* character = malloc( sizeof *character );
     // binary representation of charcter   

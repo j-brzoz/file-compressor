@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSize, char *bufor);
+int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSize, char *bufor, unsigned char *crc);
 
 #endif

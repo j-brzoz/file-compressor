@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "./convert.h"
 
-int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSize, char *bufor){
+int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSize, char *bufor, unsigned char *crc){
     unsigned char byte[1];
 
     // dictionary length in bits
@@ -74,6 +74,8 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
             // convert code to char
             byte[0] = binToDec( byteBin );
             
+            crc[0] = crc[0] ^ byte[0];
+
             // write character
             fwrite( byte, 1, 1, out );
             

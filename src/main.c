@@ -190,16 +190,10 @@ int main( int argc, char **argv) {
         else if( header[2] == '1' && header[3] == '0') {
             printf("compression rate: 12\n");
             inputSize = 12;
-            // fclose(in);
-            // fclose(out);
-            // return 1;
         }
         else if( header[2] == '1' && header[3] == '1') {
             printf("compression rate: 16\n");
             inputSize = 16;
-            // fclose(in);
-            // fclose(out);
-            // return 1;
         }
         else{
             printf("The file has been damaged!\n");
@@ -270,6 +264,7 @@ int main( int argc, char **argv) {
         while( dictLength > 0 ) {
             // read byte
             fread( bufor, 1, 1, in );
+            crc = crc ^ bufor[0];
             dictLength -= 8;
 
             // convert to 8 bit
@@ -350,6 +345,7 @@ int main( int argc, char **argv) {
                     while(codeLength > binaryBuforLength) {
                         // read byte
                         fread( bufor, 1, 1, in );
+                        crc = crc ^ bufor[0];
                         dictLength-=8;
                         // convert to 8 bit
                         tmpBinary = DectoBin((unsigned short)bufor[0], 8);
@@ -395,7 +391,7 @@ int main( int argc, char **argv) {
         //------------------------------------------------ convert 
 
         // char read from the file
-        unsigned char *c = malloc(sizeof *c);
+        unsigned char c[1];
         // binary representation of charcter   
         char *characterBinary;
         // count how many zeros we add artficially
@@ -408,18 +404,18 @@ int main( int argc, char **argv) {
         int outputCharLength = 0;
         // get chararcter
         
-        for(int i = 0; i < binaryBuforLength; i++){
-            printf("%c", binaryBufor[i]);
-        }
-        printf("\n");
+        // for(int i = 0; i < binaryBuforLength; i++){
+        //     printf("%c", binaryBufor[i]);
+        // }
+        // printf("\n");
 
         int checkOne = 1;
 
 
         while ( (readLen = fread( c, 1, 1, in ) && !feof(out) )|| checkOne) {
             checkOne = 0;
-            printf("readlen: %d\n", readLen);
-            printf("c: %d\n", c[0]);
+            // printf("readlen: %d\n", readLen);
+            // printf("c: %d\n", c[0]);
             if(readLen != 0){
                 c[0] = c[0] ^ password;
                 
@@ -446,7 +442,7 @@ int main( int argc, char **argv) {
 
             int index = 1;
 
-            printf("binarylen: %d\n", binaryBuforLength);
+            // printf("binarylen: %d\n", binaryBuforLength);
             
             // if enough bits in bufor
             while( index <= binaryBuforLength ) {
@@ -527,6 +523,21 @@ int main( int argc, char **argv) {
                 index++;
             }
             // printf("===================================================\n");
+        }
+
+        if( crc != 'J' ) {
+            printf("The file has been damaged!\n");
+            fclose(out);
+            fclose(in);
+            
+            for(int i = 0; i < uniqueCounter; i++){
+                free(codes[i]);
+            }
+            free(codes);
+            free(header);
+            free(binaryBufor);
+            
+            return 2;
         }
 
         rewind(out);
@@ -619,7 +630,6 @@ int main( int argc, char **argv) {
             free(codes[i]);
         }
         free(codes);
-        free(c);
         free(characterBinary);
         free(header);
         free(binaryBufor);
@@ -754,7 +764,7 @@ int main( int argc, char **argv) {
         }
         
         // sort inputs
-        quickSortQueue(queue, 0, uniqueCounter - 1);
+        // quickSortQueue(queue, 0, uniqueCounter - 1);
 
         // printQueue(queue, uniqueCounter);
 
@@ -764,7 +774,7 @@ int main( int argc, char **argv) {
         int temp = 0;
         while(notFull(queue, queueSize)){
             addNewNodeToQueue(queue, queueSize);
-            quickSortQueue(queue, 2*(temp+1), uniqueCounter + temp);
+            // quickSortQueue(queue, 2*(temp+1), uniqueCounter + temp);
             // printf("%d\n", temp);
             temp++;
             printf("Iteration: %d\n", temp);
@@ -773,18 +783,18 @@ int main( int argc, char **argv) {
         // temporary array for reading codes
         unsigned short tmp[uniqueCounter - 1];
 
-        // read codes from treeh
+        // read codes from tree
         readCodes(queue[queueSize-1], uniqueCounter, codes, tmp, 0);
 
         printf("Finished analyzing input!\n");
         // print codes
-        // for(int i = 0; i < uniqueCounter; i++){
-        //     printf("c:%d i:%d   ", codes[i][0], i);
-        //     for(int j = 0; j < codes[i][1]; j++){
-        //         printf("%c", (char)codes[i][j+2]);
-        //     }    
-        //     printf("\n");
-        // }
+        for(int i = 0; i < uniqueCounter; i++){
+            printf("c:%d i:%d   ", codes[i][0], i);
+            for(int j = 0; j < codes[i][1]; j++){
+                printf("%c", (char)codes[i][j+2]);
+            }    
+            printf("\n");
+        }
 
         // place for header
         char character[1];
@@ -836,18 +846,20 @@ int main( int argc, char **argv) {
         char *remainingChar = malloc(2048 * sizeof * remainingChar);
         int remainingLength;
 
-        remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar);
+        unsigned char *crc = malloc( 1 * sizeof * crc );
+        crc[0] = 'J';
+        remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar, crc);
 
         //rewind the input file
         rewind(in);
 
         // generate output
         if(inputSize == 8)
-            eightOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength);
+            eightOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
         else if(inputSize == 16)
-            sixteenOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength);
+            sixteenOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
         else if(inputSize == 12)
-            twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength);
+            twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
 
         // free memory
         for(int i = 0; i < queueSize; i++)
@@ -863,7 +875,7 @@ int main( int argc, char **argv) {
         free(freq);
         free(arr);
         free(remainingChar);
-        
+        free(crc);        
         fclose(out);
         fclose(in);
 

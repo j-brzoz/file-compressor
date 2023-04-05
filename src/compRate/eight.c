@@ -26,7 +26,7 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;       
 }
 
-void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen ) {
+void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen, unsigned char *crc ) {
     
     // char read from the file
     unsigned char *c = malloc(sizeof *c);
@@ -38,8 +38,6 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     unsigned char *bufor = malloc( 16384 * sizeof *bufor );
     // length of the bufor
     int buforLength = 0;
-    // crc
-    unsigned char crc = 'J';
     // count how many zeros we add artficially
     int zeroCounter = 0;
 
@@ -75,7 +73,7 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
             // convert code to char
             character[0] = binToDec( characterBinary ) ^ password;
 
-            crc = crc ^ binToDec( characterBinary );
+            crc[0] = crc[0] ^ binToDec( characterBinary );
             
             // write character
             fwrite( character, sizeof(char), 1, out );
@@ -105,13 +103,13 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
         // convert code to char
         character[0] = binToDec( characterBinary ) ^ password;
 
-        crc = crc ^ binToDec( characterBinary );
+        crc[0] = crc[0] ^ binToDec( characterBinary );
         
         // write character
         fwrite( character, 1, 1, out );
     }
 
-    header(out, 8, 0, 0, zeroCounter, crc);
+    header(out, 8, 0, 0, zeroCounter, crc[0]);
 
     free(c);
     free( bufor );
