@@ -237,7 +237,7 @@ int main( int argc, char **argv) {
         }
         printf("dL: %d\n", dictLength);
 
-        // unque counter
+        // unique counter
         unsigned char uniqueCounterBin[4];
         fread( uniqueCounterBin, 1, 4, in);
 
@@ -264,8 +264,10 @@ int main( int argc, char **argv) {
         while( dictLength > 0 ) {
             // read byte
             fread( bufor, 1, 1, in );
+            bufor[0] = bufor[0] ^ password;
             crc = crc ^ bufor[0];
             dictLength -= 8;
+            
 
             // convert to 8 bit
             tmpBinary = DectoBin((unsigned short)bufor[0], 8);
@@ -345,6 +347,7 @@ int main( int argc, char **argv) {
                     while(codeLength > binaryBuforLength) {
                         // read byte
                         fread( bufor, 1, 1, in );
+                        bufor[0] = bufor[0] ^ password;
                         crc = crc ^ bufor[0];
                         dictLength-=8;
                         // convert to 8 bit
@@ -541,13 +544,14 @@ int main( int argc, char **argv) {
         }
 
         rewind(out);
-        char *nullBufor = malloc(2000 * sizeof * nullBufor);
+        unsigned char *nullBufor = malloc(2000 * sizeof * nullBufor);
         int nullCounter[2] = {0, 0};
         int len;
         while(len = fread(nullBufor, 1, 2000, out)){
             // for(int i = 0 ; i < len; i++)
             //     printf("%d ", nullBufor[i]);
             // printf("\n");
+
             if(nullBufor[len - 2] == 0)
                 nullCounter[0] = 1;
             else
@@ -646,11 +650,13 @@ int main( int argc, char **argv) {
             // for(int i = 0 ; i < len; i++)
             //     printf("%d ", nullBufor[i]);
             // printf("\n");
+
             if(nullBufor[len - 2] == 0)
                 nullCounter[0] = 1;
             else
                 nullCounter[0] = 0;
 
+            printf("%d\n", nullBufor[len-1]);
             if(nullBufor[len - 1] == 0)
                 nullCounter[1] = 1;
             else
@@ -848,7 +854,7 @@ int main( int argc, char **argv) {
 
         unsigned char *crc = malloc( 1 * sizeof * crc );
         crc[0] = 'J';
-        remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar, crc);
+        remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar, crc, password);
 
         //rewind the input file
         rewind(in);
