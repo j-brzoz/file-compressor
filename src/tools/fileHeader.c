@@ -2,25 +2,18 @@
 #include <stdlib.h>
 #include "convert.h"
 
-void header(FILE *out, int inputSize, int isOdd, int remainder, int zeroCounter, unsigned char crc){
+void header(FILE *out, int inputSize, int zeroCounter, unsigned char crc){
     // charcter that will be put in the output file
     char* character = malloc( sizeof *character );
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
 
-    if( remainder == 1 ) {
-        characterBinary[0] = '0';
-        characterBinary[1] = '1';
-    }
-    else if( remainder == 2 ) {
-        characterBinary[0] = '1';
-        characterBinary[1] = '0';
-    }
-    else {
-        characterBinary[0] = '0';
-        characterBinary[1] = '0';
-    }
+    // to check if file has not been damaged
+    characterBinary[0] = '1';
+    characterBinary[1] = '1';
+    characterBinary[4] = '1';
 
+    // which compression rate was used
     if( inputSize == 8 ) {
         characterBinary[2] = '0';
         characterBinary[3] = '1';
@@ -34,13 +27,7 @@ void header(FILE *out, int inputSize, int isOdd, int remainder, int zeroCounter,
         characterBinary[3] = '1';
     }
 
-    if(isOdd == 0){
-        characterBinary[4] = '0';
-    }
-    else {
-        characterBinary[4] = '1';
-    }
-
+    // how many zeros we added
     switch (zeroCounter) {
         case 0:
             characterBinary[5] = '0';

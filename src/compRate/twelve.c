@@ -306,7 +306,8 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
         fwrite( character, 1, 1, out );
     }
 
-    header(out, 12, 0, remainder, zeroCounter, crc[0]);
+    // write header
+    header(out, 12, zeroCounter, crc[0]);
 
     free( inputBufor );
     free( character );

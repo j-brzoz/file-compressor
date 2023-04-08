@@ -215,7 +215,8 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
         fwrite(character, 1, 1, out);
     }
 
-    header(out, 16, isOdd, 0, zeroCounter, crc[0]);
+    // write header
+    header(out, 16, zeroCounter, crc[0]);
 
     free( inputBufor );
     free( character );

@@ -109,7 +109,8 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
         fwrite( character, 1, 1, out );
     }
 
-    header(out, 8, 0, 0, zeroCounter, crc[0]);
+    // write header
+    header(out, 8, zeroCounter, crc[0]);
 
     free(c);
     free( bufor );

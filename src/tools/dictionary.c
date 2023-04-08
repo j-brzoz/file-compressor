@@ -41,6 +41,7 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
     char *value;
     char *byteBin = malloc(8 * sizeof * byteBin);
 
+    // write dictionary
     for(int i = 0; i < uniqueCounter; i++){
         
         value = DectoBin(codes[i][0], inputSize);
@@ -48,7 +49,7 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
             bufor[j+buforLength] = value[j];
         }
         buforLength += inputSize;
-        
+
         free(value);
         value = DectoBin(codes[i][1], 8);
         
@@ -65,23 +66,13 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
         buforLength += codes[i][1];
 
         while( buforLength >= 8 ) {
-        
-            // get code from bufor
             for(int j = 0; j < 8; j++) {
                 byteBin[j] = bufor[j];
-            }
-            
-            // convert code to char
+            }  
             byte[0] = binToDec( byteBin );
-            
             crc[0] = crc[0] ^ byte[0];
-
             byte[0] = byte[0] ^ password;
-
-            // write character
             fwrite( byte, 1, 1, out );
-            
-            // move codes in bufor
             for( int j = 0; j < buforLength - 8; j++ ) {
                 bufor[j] = bufor[j + 8];
             }

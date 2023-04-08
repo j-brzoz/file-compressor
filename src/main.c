@@ -33,29 +33,28 @@ char *helpString =
 
 int main( int argc, char **argv) {
 
+    // for measuring time
     clock_t t;
     t = clock();
-
-    // amount of bytes that we will read as one char
+    // amount of bytes that we will be read as one values
     int inputSize = 0;
-
     // default password for data encrypting (doesn't change anything)
     char password = 0;
-
     // mandatory options
     int checkCompRate = 0;
     int checkInput = 0;
     int checkOutput = 0;
-
-    // input and outour files
+    // input and output files
     FILE *in;
     FILE *out;
-
+    // string for file names and password
     char *outputFile = NULL;
     char *inputFile = NULL;
-    char *inputPassword = NULL;
-    
+    char *inputPassword = NULL;  
+    // for decompression
     int isDecomp = 0;
+    //for verbose mode
+    int isVerbose = 0;
     
     int c;
     while ((c = getopt (argc, argv, "123x:z:c:vho:")) != -1)
@@ -92,8 +91,8 @@ int main( int argc, char **argv) {
             }
             break;
         case 'v':       // give additional information
-            fprintf( stderr, "Feature has not been implemented yet!\n");
-            return EXIT_FAILURE;
+            isVerbose++;
+            break;
         case 'h':       // print help
             printf("%s", helpString);
             break;
@@ -172,42 +171,42 @@ int main( int argc, char **argv) {
 
     if( isDecomp > 0 ) {
 
+        // file length in bytes
         unsigned long long int inputFileLength = 0;
+        // bufor
         unsigned char *inputFileBufor = malloc(2000 * sizeof * inputFileBufor);
+        // bufor length
         int length = 0;
         while( length = fread(inputFileBufor, 1, 2000, in)){
             inputFileLength += length;
         }
+        
         free(inputFileBufor);
+        
         rewind(in);
 
+        // which byte in input file we currently analyze
         unsigned long long int byteInInputFile = 0;
 
-        // --------------------------------------------------header info
+        // get info from header
         unsigned char info[1];
-        int infoLen = 0;
-        infoLen = fread(info, 1, 1, in);
+        fread(info, 1, 1, in);
         byteInInputFile++;
+
+        // compression rate of compressed file 
         int inputSize;
+        
+        // convert info to binary string
         char *header;
         header = DectoBin((unsigned short)info[0], 8);
-        int remainder;
 
-        if(header[0] == '1' && header[1] == '1'){
+        // make sure the file has not been damaged
+        if(header[0] != '1' || header[1] != '1' || header[4] != '1'){
             printf("The file has been damaged!\n");
             fclose(in);
             fclose(out);
             free(header);
             return 1;
-        }
-        else if(header[0] == '0' && header[1] == '1'){
-            remainder = 2; 
-        }
-        else if(header[0] == '1' && header[1] == '0'){
-            remainder = 1; 
-        }
-        else if(header[0] == '0' && header[1] == '0'){
-            remainder = 0; 
         }
 
         if( header[2] == '0' && header[3] == '1') {
@@ -227,11 +226,7 @@ int main( int argc, char **argv) {
             return 1;
         }
 
-        int isOdd = 0;
-        if(header[4] == '1'){
-            isOdd = 1;
-        }
-
+        // how many 'empty' zeros were added to the file
         int addedZeros = 0;
         int power = 4;
         for(int i = 0; i < 3; i++){
@@ -239,15 +234,15 @@ int main( int argc, char **argv) {
             power /= 2;
         }
         
-        infoLen = fread(info, 1, 1, in);
+        // more info
+        fread(info, 1, 1, in);
         byteInInputFile++;
 
+        // get crc from info
         unsigned char crc;        
         crc = info[0];
-
-        //----------------------------------------- dictionary
         
-        // dictionary length
+        // dictionary length in bits
         unsigned char dictLengthBin[4];
         unsigned short value;
         unsigned short codeLength = 0;
@@ -261,11 +256,10 @@ int main( int argc, char **argv) {
             power *= 256;
         }
 
-        // unique counter
+        // unumber of unique values
         unsigned char uniqueCounterBin[4];
         fread( uniqueCounterBin, 1, 4, in);
         byteInInputFile += 4;
-
         int uniqueCounter = 0;
         power = 1;
         for(int i = 3; i >= 0; i--){
@@ -292,10 +286,10 @@ int main( int argc, char **argv) {
             crc = crc ^ bufor[0];
             dictLength -= 8;
             
-
             // convert to 8 bit
             tmpBinary = DectoBin((unsigned short)bufor[0], 8);
 
+            // omit added zeros if last byte
             if(byteInInputFile != inputFileLength){
                 for(int j = 0; j < 8; j++){
                     binaryBufor[binaryBuforLength + j] = tmpBinary[j];
@@ -308,7 +302,6 @@ int main( int argc, char **argv) {
                 }
                 binaryBuforLength += (8 - addedZeros);
             }
-
             free(tmpBinary);
 
             // get value and code length
@@ -324,12 +317,12 @@ int main( int argc, char **argv) {
                 // code length
                 power = 1;
                 codeLength = 0;
-
                 for(int j = 0; j < 8; j++) {
                     codeLength += (binaryBufor[inputSize + 8 - 1 - j]-48) * power;
                     power *= 2;
                 }
-                ;
+                
+                // put value and code length in codes
                 for(int j = 0; j < uniqueCounter; j++){
                     if(codes[j] == NULL){
                         codes[j] = malloc((codeLength+2) * sizeof codes);
@@ -339,33 +332,36 @@ int main( int argc, char **argv) {
                         break;
                     }
                 }
+
+                // move data in bufor
                 for (int j = 0; j < binaryBuforLength - (inputSize + 8); j++){
                     binaryBufor[j] = binaryBufor[j + inputSize + 8];
                 }
                 binaryBuforLength -= inputSize;
                 binaryBuforLength -= 8;
-                // code
+
+                // get value's code if enough bits in bufor
                 if(binaryBuforLength > codeLength) {
+                    // put in codes
                     for(int j = 0; j < codeLength; j++){
                         codes[index][j+2] = binaryBufor[j];
                     }
-                    
-                    for (int j = 0; j < binaryBuforLength - codeLength; j++)
-                    {
+                    // move data in bufor
+                    for (int j = 0; j < binaryBuforLength - codeLength; j++){
                         binaryBufor[j] = binaryBufor[j + codeLength];
                     }
                     binaryBuforLength -= codeLength;
                 }
                 else {
+                    // if not enough bits in bufor, get more bits 
                     while(codeLength > binaryBuforLength) {
-                        // read byte
                         fread( bufor, 1, 1, in );
                         byteInInputFile++;
                         bufor[0] = bufor[0] ^ password;
                         crc = crc ^ bufor[0];
-                        dictLength-=8;
-                        // convert to 8 bit
+                        dictLength -= 8;
                         tmpBinary = DectoBin((unsigned short)bufor[0], 8);
+                         // omit added zeros if last byte
                         if(byteInInputFile != inputFileLength){
                             for(int j = 0; j < 8; j++){
                                 binaryBufor[binaryBuforLength + j] = tmpBinary[j];
@@ -380,11 +376,12 @@ int main( int argc, char **argv) {
                         }
                         free(tmpBinary);
                     }
+                    // put in codes
                     for(int j = 0; j < codeLength; j++){
                         codes[index][2+j] = binaryBufor[j];
                     }
-                    for (int j = 0; j < binaryBuforLength - codeLength; j++)
-                    {
+                    // move data in bufor
+                    for (int j = 0; j < binaryBuforLength - codeLength; j++){
                         binaryBufor[j] = binaryBufor[j + codeLength];
                     }
                     binaryBuforLength -= codeLength;
@@ -392,48 +389,44 @@ int main( int argc, char **argv) {
             }
         }
         
-
-        // print codes
-        // for(int i = 0; i < uniqueCounter; i++){
-        //     printf("c:%d i:%d   ", codes[i][0], i);
-        //     for(int j = 0; j < codes[i][1]; j++){
-        //         printf("%c", (char)codes[i][j+2]);
-        //     }    
-        //     printf("\n");
-        // }
-
-        //------------------------------------------------ convert 
+        if(isVerbose){
+            printf("Number of unique values: %d\n", uniqueCounter);
+            for(int i = 0; i < uniqueCounter; i++){
+                printf("value: %d   code: ", codes[i][0]);
+                for(int j = 0; j < codes[i][1]; j++){
+                    printf("%c", (char)codes[i][j+2]);
+                }    
+                printf("\n");
+            }
+        }
 
         // char read from the file
         unsigned char c[1];
         // binary representation of charcter   
         char *characterBinary;
-        // count how many zeros we add artficially
-        int zeroCounter = 0;
+        // length of read data
         int readLen;
-        unsigned char lastChar;
+        // how many chars in decompressed file
         int allChars = 0;
-        // char *outputBufor = malloc()
+        // array for chars put in decompressed file
         unsigned char outputChar[3];
+        // for 12 bit compression rate
         int outputCharLength = 0;
-        // get chararcter
-
+        // to make sure we enter "while" loop at least once
         int checkOne = 1;
 
-
+        // if we read something and it's not the end of the file or first iteration
         while ( (readLen = fread( c, 1, 1, in ) && !feof(out) )|| checkOne) {
             checkOne = 0;
+
+            // if we read new data
             if(readLen != 0){
                 byteInInputFile++;
-
                 c[0] = c[0] ^ password;
-                
-                lastChar = c[0];
-
                 crc = crc ^ c[0];
-
                 characterBinary = DectoBin( (unsigned short)(c[0]), 8);
-
+            
+                // omit added zeros if last byte
                 if(byteInInputFile != inputFileLength) {
                     for(int i = 0 ; i < 8; i++){
                         binaryBufor[binaryBuforLength + i] = characterBinary[i];
@@ -449,48 +442,60 @@ int main( int argc, char **argv) {
                 free(characterBinary);
             }
 
+            // for checking codes; represents length of currently processed binary string
             int index = 1;
-            
-            // if enough bits in bufor
             while( index <= binaryBuforLength ) {
+               
+                // check for every code in codes
                 for(int i = 0; i < uniqueCounter; i++){
+                    
+                    // if lengths are the same
                     if(codes[i][1] == index){
+                        
+                        // variable for checking if bits in code are right
                         int check = 0;
                         for(int j = 0; j < index; j++){
                             if(codes[i][2+j] == binaryBufor[j]){
                                 check++;
                             }
                         }
+
+                        // if all bits are the same in codes
                         if(check == index){
+
+                            // 8 bit compression rate
                             if(inputSize == 8){
                                 outputChar[0] = (unsigned char)codes[i][0];
                                 fwrite( outputChar, 1, 1, out );
                                 allChars++;
-                            }
+                            } // 12 bit compression rate
                             else if(inputSize == 12){
+                                // 1 + 0,5 bytes
                                 unsigned short mask1a = 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16;
                                 unsigned short mask2a = 8 + 4 + 2 + 1;
 
+                                // 0,5 + 1 bytes
                                 unsigned short mask1b = 2048 + 1024 + 512 + 256;
                                 unsigned short mask2b = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1;
                                 
+                                // 1 + 0,5 bytes
                                 if(outputCharLength == 0) {
                                     outputChar[0] = (unsigned char)((codes[i][0] & mask1a) / 16);
                                     outputChar[1] = (unsigned char)((codes[i][0] & mask2a) * 16);
                                     outputCharLength++;
-                                }
+                                } // 0,5 + 1 bytes
                                 else if(outputCharLength == 1) {
                                     outputChar[1] += (unsigned char)((codes[i][0] & mask1b) / 256);
                                     outputChar[2] = (unsigned char)((codes[i][0] & mask2b));
                                     outputCharLength++;
-                                }
+                                } // if we got 3 chars
                                 if(outputCharLength == 2){
                                     fwrite( outputChar, 1, 3, out );
                                     allChars += 3;
                                     outputCharLength = 0;
                                 }
 
-                            }
+                            } // 16 bit compression rate
                             else{
                                 unsigned short mask1 = 32768 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256;
                                 unsigned short mask2 = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1;
@@ -503,8 +508,7 @@ int main( int argc, char **argv) {
                             }
                             
                             // move codes in bufor
-                            for (int h = 0; h < binaryBuforLength - index; h++)
-                            {
+                            for (int h = 0; h < binaryBuforLength - index; h++) {
                                 binaryBufor[h] = binaryBufor[h + index];
                             }
                             binaryBuforLength -= index;
@@ -512,16 +516,18 @@ int main( int argc, char **argv) {
                         }
                     }
                 }
+                // if code not found, increase index length
                 index++;
             }
         }
 
+        // to make sure we don't lose any data from 12 bit compression
         if(outputCharLength == 1){
             fwrite( outputChar, 1, 2, out );
             allChars += 2;
             outputCharLength = 0;
         }
-
+    
         if( crc != 'J' ) {
             printf("The file has been damaged!\n");
             fclose(out);
@@ -538,16 +544,22 @@ int main( int argc, char **argv) {
         }
 
         rewind(out);
+        
+        // delete trailing NULLs that are put in decompressed file 
+        // if number of chars in initially compressed file was odd for 16 bit compression
+        // if number of chars in initially compressed file was not divisible by 3 for 12 bit compression
         unsigned char *nullBufor = malloc(2000 * sizeof * nullBufor);
         int nullCounter[2] = {0, 0};
         int len;
         while(len = fread(nullBufor, 1, 2000, out)){
 
+            // second to last char
             if(nullBufor[len - 2] == 0)
                 nullCounter[0] = 1;
             else
                 nullCounter[0] = 0;
 
+            // last char
             if(nullBufor[len - 1] == 0)
                 nullCounter[1] = 1;
             else
@@ -557,6 +569,7 @@ int main( int argc, char **argv) {
         fclose(out);
         fclose(in);
 
+        // truncate file to appropriate size
         if(nullCounter[1] == 1 && nullCounter[0] == 1){
             truncate(outputFile, allChars - 2);
             allChars -= 2;
@@ -566,6 +579,7 @@ int main( int argc, char **argv) {
             allChars--;
         }
 
+        // free allocated memory
         for(int i = 0; i < uniqueCounter; i++){
             free(codes[i]);
         }
@@ -573,6 +587,11 @@ int main( int argc, char **argv) {
         free(header);
         free(binaryBufor);
         free(nullBufor);
+
+        // calculated the time
+        t = clock() - t;
+        double timeTaken = ((double)t)/CLOCKS_PER_SEC;
+        printf("Decompression complete in %fs\n", timeTaken);
     }
     else {    
         // number of unique chars
@@ -608,8 +627,6 @@ int main( int argc, char **argv) {
             uniqueCounter = sixteenAnalyzeInput(in, charcounter, uniqueCounter);
         else if(inputSize == 12)
             uniqueCounter = twelveAnalyzeInput(in, charcounter, uniqueCounter);
-
-        printf("Finished getting input!\n");
 
         // if there is one char in the file
         if( uniqueCounter == 1 ) {
@@ -673,8 +690,6 @@ int main( int argc, char **argv) {
         while(notFull(queue, queueSize)){
             addNewNodeToQueue(queue, queueSize);
             temp++;
-            if(temp % 1000 == 0)
-                printf("Iteration: %d\n", temp);
         }
 
         // temporary array for reading codes
@@ -683,14 +698,15 @@ int main( int argc, char **argv) {
         // read codes from tree
         readCodes(queue[queueSize-1], uniqueCounter, codes, tmp, 0);
 
-        printf("Finished analyzing input!\n");
-        // print codes
-        for(int i = 0; i < uniqueCounter; i++){
-            printf("c:%d i:%d   ", codes[i][0], i);
-            for(int j = 0; j < codes[i][1]; j++){
-                printf("%c", (char)codes[i][j+2]);
-            }    
-            printf("\n");
+        if(isVerbose){
+            printf("Number of unique values: %d\n", uniqueCounter);
+            for(int i = 0; i < uniqueCounter; i++){
+                printf("value: %d   code: ", codes[i][0]);
+                for(int j = 0; j < codes[i][1]; j++){
+                    printf("%c", (char)codes[i][j+2]);
+                }    
+                printf("\n");
+            }
         }
 
         // place for header
@@ -704,9 +720,9 @@ int main( int argc, char **argv) {
 
         unsigned char *crc = malloc( 1 * sizeof * crc );
         crc[0] = 'J';
+        // generate dictionary
         remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar, crc, password);
 
-        //rewind the input file
         rewind(in);
 
         // generate output
@@ -717,7 +733,7 @@ int main( int argc, char **argv) {
         else if(inputSize == 12)
             twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
 
-        // free memory
+        // free allocated memory
         for(int i = 0; i < queueSize; i++)
             free(queue[i]);
 
@@ -735,14 +751,10 @@ int main( int argc, char **argv) {
         fclose(out);
         fclose(in);
 
-        // check message
-        printf("everything went well!\n");
-
+        // calculate the time
         t = clock() - t;
-
         double timeTaken = ((double)t)/CLOCKS_PER_SEC;
-
-        printf("time: %f\n", timeTaken);
+        printf("Compression complete in %fs\n", timeTaken);
     
     }
 
