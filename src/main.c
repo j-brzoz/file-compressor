@@ -154,6 +154,23 @@ int main( int argc, char **argv) {
         }
     }
     
+    
+
+    if(strlen(outputFile) == strlen(inputFile)){
+        int check = 0;
+        for(int i = 0; i < strlen(outputFile); i++){
+            if(outputFile[i] == inputFile[i]){
+                check++;
+            }
+        }
+
+        if(check == strlen(outputFile)){
+            fclose(in);
+            fprintf (stderr, "Input and output files must have different names!\n");
+            return EXIT_FAILURE;
+        }
+    }
+
     out = fopen( outputFile, "wb+");
 
     if( isDecomp > 0 ) {
