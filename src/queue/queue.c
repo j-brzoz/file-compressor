@@ -37,12 +37,6 @@ node *findMinNotUsedNode(node **queue, int queueSize){
             minIndex = i;
         }
     }
-    // for(int i = 0; i < queueSize; i++){
-    //     if(queue[i]->used == false){
-    //         queue[i]->used = true;
-    //         return queue[i];
-    //     }
-    // }
     queue[minIndex]->used = true;
     return queue[minIndex];
 }

@@ -1,5 +1,5 @@
 compressor: 
-	@$(CC) src/main.c src/compRate/eight.c src/compRate/sixteen.c src/compRate/twelve.c src/queue/node.c src/queue/queue.c src/queue/sort.c src/tools/convert.c src/tools/fileHeader.c src/tools/dictionary.c -o compressor -lm
+	@$(CC) src/main.c src/compRate/eight.c src/compRate/sixteen.c src/compRate/twelve.c src/queue/node.c src/queue/queue.c src/tools/convert.c src/tools/fileHeader.c src/tools/dictionary.c -o compressor -lm
 
 compress-8-small: compressor
 	@./compressor -x tests/small/easy.txt -o easy8.huff -1
@@ -39,7 +39,7 @@ test-8-big: compress-8-big
 	@cmp -s tests/big/alphabet.txt alphabet8.txt && echo "8 - SAME - alphabet.txt" || echo "8 - DIFF - alphabet.txt"
 	@cmp -s tests/big/gen.txt gen8.txt && echo "8 - SAME - gen.txt" || echo "8 - DIFF - gen.txt"
 	@cmp -s tests/big/lotr.txt lotr8.txt && echo "8 - SAME - lotr.txt" || echo "8 - DIFF - lotr.txt"
-	@cmp -s tests/big/pan-tadeusz8.txt pan-tadeusz8.txt && echo "8 - SAME - pan-tadeusz.txt" || echo "8 - DIFF - pan-tadeusz.txt"
+	@cmp -s tests/big/pan-tadeusz.txt pan-tadeusz8.txt && echo "8 - SAME - pan-tadeusz.txt" || echo "8 - DIFF - pan-tadeusz.txt"
 	@cmp -s tests/big/test-jpg.jpg test-jpg8.jpg && echo "8 - SAME - test-jpg.jpg" || echo "8 - DIFF - test-jpg.jpg"
 	@cmp -s tests/big/test-pdf.pdf test-pdf8.pdf && echo "8 - SAME - test-pdf.pdf" || echo "8 - DIFF - test-pdf.pdf"
 	@cmp -s tests/big/test-png.png test-png8.png && echo "8 - SAME - test-png.png" || echo "8 - DIFF -test-png.png"
