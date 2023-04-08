@@ -200,6 +200,7 @@ int main( int argc, char **argv) {
             printf("The file has been damaged!\n");
             fclose(in);
             fclose(out);
+            free(header);
             return 1;
         }
         else if(header[0] == '0' && header[1] == '1'){
@@ -228,6 +229,7 @@ int main( int argc, char **argv) {
             printf("The file has been damaged!\n");
             fclose(in);
             fclose(out);
+            free(header);
             return 1;
         }
 
@@ -650,6 +652,17 @@ int main( int argc, char **argv) {
             truncate(outputFile, allChars - 1);
             allChars--;
         }
+
+        // free(bufor);
+        // free(characterRead);
+        for(int i = 0; i < uniqueCounter; i++){
+            free(codes[i]);
+        }
+        free(codes);
+        free(header);
+        free(binaryBufor);
+        free(nullBufor);
+
 
         // // handling added zeros
         // characterBinary = DectoBin((unsigned short)(lastChar), 8);
