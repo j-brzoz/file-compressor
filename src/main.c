@@ -158,10 +158,22 @@ int main( int argc, char **argv) {
 
     if( isDecomp > 0 ) {
 
+        unsigned long long int inputFileLength = 0;
+        unsigned char *inputFileBufor = malloc(2000 * sizeof * inputFileBufor);
+        int length = 0;
+        while( length = fread(inputFileBufor, 1, 2000, in)){
+            inputFileLength += length;
+        }
+        free(inputFileBufor);
+        rewind(in);
+
+        unsigned long long int byteInInputFile = 0;
+
         // --------------------------------------------------header info
         unsigned char info[1];
         int infoLen = 0;
         infoLen = fread(info, 1, 1, in);
+        byteInInputFile++;
         int inputSize;
         char *header;
         header = DectoBin((unsigned short)info[0], 8);
@@ -184,15 +196,15 @@ int main( int argc, char **argv) {
         }
 
         if( header[2] == '0' && header[3] == '1') {
-            printf("compression rate: 8\n");
+            // printf("compression rate: 8\n");
             inputSize = 8;
         }
         else if( header[2] == '1' && header[3] == '0') {
-            printf("compression rate: 12\n");
+            // printf("compression rate: 12\n");
             inputSize = 12;
         }
         else if( header[2] == '1' && header[3] == '1') {
-            printf("compression rate: 16\n");
+            // printf("compression rate: 16\n");
             inputSize = 16;
         }
         else{
@@ -206,7 +218,7 @@ int main( int argc, char **argv) {
         if(header[4] == '1'){
             isOdd = 1;
         }
-        printf("isOdd: %d\n", isOdd);
+        // printf("isOdd: %d\n", isOdd);
 
         int addedZeros = 0;
         int power = 4;
@@ -214,9 +226,10 @@ int main( int argc, char **argv) {
             addedZeros += (header[i+5]-48) * power;
             power /= 2;
         }
-        printf("added zeros: %d\n", addedZeros);
+        // printf("added zeros: %d\n", addedZeros);
         
         infoLen = fread(info, 1, 1, in);
+        byteInInputFile++;
 
         unsigned char crc;        
         crc = info[0];
@@ -228,6 +241,7 @@ int main( int argc, char **argv) {
         unsigned short value;
         unsigned short codeLength = 0;
         fread( dictLengthBin, 1, 4, in);
+        byteInInputFile += 4;
 
         int dictLength = 0;
         power = 1;
@@ -235,11 +249,12 @@ int main( int argc, char **argv) {
             dictLength += dictLengthBin[i] * power;
             power *= 256;
         }
-        printf("dL: %d\n", dictLength);
+        // printf("dL: %d\n", dictLength);
 
         // unique counter
         unsigned char uniqueCounterBin[4];
         fread( uniqueCounterBin, 1, 4, in);
+        byteInInputFile += 4;
 
         int uniqueCounter = 0;
         power = 1;
@@ -247,7 +262,7 @@ int main( int argc, char **argv) {
             uniqueCounter += uniqueCounterBin[i] * power;
             power *= 256;
         }
-        printf("uni: %d\n", uniqueCounter);
+        // printf("uni: %d\n", uniqueCounter);
 
 
         // codes
@@ -264,6 +279,7 @@ int main( int argc, char **argv) {
         while( dictLength > 0 ) {
             // read byte
             fread( bufor, 1, 1, in );
+            byteInInputFile++;
             bufor[0] = bufor[0] ^ password;
             crc = crc ^ bufor[0];
             dictLength -= 8;
@@ -277,11 +293,20 @@ int main( int argc, char **argv) {
             //     printf("%c", tmpBinary[h]);
             // }
             // printf("\n");
-
-            for(int j = 0; j < 8; j++){
-                binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+            if(byteInInputFile != inputFileLength){
+                for(int j = 0; j < 8; j++){
+                    // printf("check1a\n");
+                    binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+                }
+                binaryBuforLength += 8;
             }
-            binaryBuforLength += 8;
+            else {
+                for(int j = 0; j < 8 - addedZeros; j++){
+                    // printf("check1b\n");
+                    binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+                }
+                binaryBuforLength += (8 - addedZeros);
+            }
             // printf("bufor[%d] vl: ", binaryBuforLength);
             // for(int h = 0; h < binaryBuforLength; h++){
             //     printf("%c", binaryBufor[h]);
@@ -347,15 +372,26 @@ int main( int argc, char **argv) {
                     while(codeLength > binaryBuforLength) {
                         // read byte
                         fread( bufor, 1, 1, in );
+                        byteInInputFile++;
                         bufor[0] = bufor[0] ^ password;
                         crc = crc ^ bufor[0];
                         dictLength-=8;
                         // convert to 8 bit
                         tmpBinary = DectoBin((unsigned short)bufor[0], 8);
-                        for(int j = 0; j < 8; j++){
-                            binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+                        if(byteInInputFile != inputFileLength){
+                            for(int j = 0; j < 8; j++){
+                                // printf("check2a\n");
+                                binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+                            }
+                            binaryBuforLength += 8;
                         }
-                        binaryBuforLength += 8;
+                        else {
+                            for(int j = 0; j < 8 - addedZeros; j++){
+                                // printf("check2b\n");
+                                binaryBufor[binaryBuforLength + j] = tmpBinary[j];
+                            }
+                            binaryBuforLength += (8 - addedZeros);
+                        }
                         free(tmpBinary);
                     }
                     // printf("bufor[%d] cb: ", binaryBuforLength);
@@ -383,13 +419,13 @@ int main( int argc, char **argv) {
         
 
         // print codes
-        for(int i = 0; i < uniqueCounter; i++){
-            printf("c:%d i:%d   ", codes[i][0], i);
-            for(int j = 0; j < codes[i][1]; j++){
-                printf("%c", (char)codes[i][j+2]);
-            }    
-            printf("\n");
-        }
+        // for(int i = 0; i < uniqueCounter; i++){
+        //     printf("c:%d i:%d   ", codes[i][0], i);
+        //     for(int j = 0; j < codes[i][1]; j++){
+        //         printf("%c", (char)codes[i][j+2]);
+        //     }    
+        //     printf("\n");
+        // }
 
         //------------------------------------------------ convert 
 
@@ -420,6 +456,8 @@ int main( int argc, char **argv) {
             // printf("readlen: %d\n", readLen);
             // printf("c: %d\n", c[0]);
             if(readLen != 0){
+                byteInInputFile++;
+
                 c[0] = c[0] ^ password;
                 
                 lastChar = c[0];
@@ -429,11 +467,20 @@ int main( int argc, char **argv) {
                 characterBinary = DectoBin( (unsigned short)(c[0]), 8);
                 
                 // printf("datalen: %d\n", dataLength);
-
-                for(int i = 0 ; i < 8; i++){
-                    binaryBufor[binaryBuforLength + i] = characterBinary[i];
+                if(byteInInputFile != inputFileLength) {
+                    for(int i = 0 ; i < 8; i++){
+                        // printf("check3a\n");
+                        binaryBufor[binaryBuforLength + i] = characterBinary[i];
+                    }
+                    binaryBuforLength += 8;
                 }
-                binaryBuforLength += 8;
+                else {
+                    for(int i = 0 ; i < 8 - addedZeros; i++){
+                        // printf("check3b\n");
+                        binaryBufor[binaryBuforLength + i] = characterBinary[i];
+                    }
+                    binaryBuforLength += (8 - addedZeros);
+                }
                 free(characterBinary);
             }
             // printf("datalen: %d\n", dataLength);
@@ -490,6 +537,7 @@ int main( int argc, char **argv) {
                                 }
                                 if(outputCharLength == 2){
                                     fwrite( outputChar, 1, 3, out );
+                                    // printf("out: %d %d %d\n", outputChar[0], outputChar[1], outputChar[2]);
                                     allChars += 3;
                                     outputCharLength = 0;
                                 }
@@ -526,6 +574,13 @@ int main( int argc, char **argv) {
                 index++;
             }
             // printf("===================================================\n");
+        }
+
+        if(outputCharLength == 1){
+            fwrite( outputChar, 1, 2, out );
+            // printf("out2: %d %d\n", outputChar[0], outputChar[1]);
+            allChars += 2;
+            outputCharLength = 0;
         }
 
         if( crc != 'J' ) {
@@ -566,114 +621,114 @@ int main( int argc, char **argv) {
         fclose(out);
         fclose(in);
 
-        printf("all chars: %d\n", allChars);
+        // printf("all chars: %d\n", allChars);
 
         if(nullCounter[1] == 1 && nullCounter[0] == 1){
-            printf("trun2\n");
+            // printf("trun2\n");
             truncate(outputFile, allChars - 2);
             allChars -= 2;
         }
         else if(nullCounter[1] == 1 ){
-            printf("trun1: ");                 
-            printf("%d\n", truncate(outputFile, allChars - 1));
+            // printf("trun1\n");                 
+            truncate(outputFile, allChars - 1);
             allChars--;
         }
 
-        // handling added zeros
-        characterBinary = DectoBin((unsigned short)(lastChar), 8);
-        index = 1;
-        int removeChars = 0;
-        printf("added zeros: %d\n", addedZeros);
-        int characterBinaryLen = addedZeros;
-        int isOddIteration = 1;
-        // if enough bits in bufor
-        while( index <= characterBinaryLen ) {
-            // printf("index: %d\n", index);
-            for(int i = 0; i < uniqueCounter; i++){
-                // printf("codeslen: %d\n", codes[i][1]);
-                if(codes[i][1] == index){
-                    // printf("codeslen: %d index: %d\n", index, codes[i][1]);
-                    int check = 0;
-                    for(int j = 0; j < index; j++){
-                        if(codes[i][2+j] == characterBinary[8 - addedZeros + j]){
-                            check++;
-                        }
-                    }
-                    if(check == index){
-                        // printf("found: %c\n", (unsigned char)codes[i][0]);
-                        if( inputSize == 8 ) {
-                            removeChars++;
-                        }
-                        else if( inputSize == 12) {
-                            removeChars += 1 + isOddIteration;
-                            isOddIteration = isOddIteration == 1 ? 0 : 1;
-                        }
-                        else {
-                            removeChars+=2;
-                        }
-                        // move codes in bufor
-                        for (int h = 0; h < characterBinaryLen - index; h++)
-                        {
-                            characterBinary[h] = characterBinary[8 - characterBinaryLen + h];
-                        }
-                        characterBinaryLen -= index;
-                        index = 0;
-                        // for(int n = 0; n < dataLength; n++){
-                        //     printf("%c", data[n]);
-                        // }
-                        // printf("\n");
-                    }
-                }
-            }
-            index++;
-        }
+        // // handling added zeros
+        // characterBinary = DectoBin((unsigned short)(lastChar), 8);
+        // index = 1;
+        // int removeChars = 0;
+        // // printf("added zeros: %d\n", addedZeros);
+        // int characterBinaryLen = addedZeros;
+        // int isOddIteration = 1;
+        // // if enough bits in bufor
+        // while( index <= characterBinaryLen ) {
+        //     // printf("index: %d\n", index);
+        //     for(int i = 0; i < uniqueCounter; i++){
+        //         // printf("codeslen: %d\n", codes[i][1]);
+        //         if(codes[i][1] == index){
+        //             // printf("codeslen: %d index: %d\n", index, codes[i][1]);
+        //             int check = 0;
+        //             for(int j = 0; j < index; j++){
+        //                 if(codes[i][2+j] == characterBinary[8 - addedZeros + j]){
+        //                     check++;
+        //                 }
+        //             }
+        //             if(check == index){
+        //                 // printf("found: %c\n", (unsigned char)codes[i][0]);
+        //                 if( inputSize == 8 ) {
+        //                     removeChars++;
+        //                 }
+        //                 else if( inputSize == 12) {
+        //                     removeChars += 1 + isOddIteration;
+        //                     isOddIteration = isOddIteration == 1 ? 0 : 1;
+        //                 }
+        //                 else {
+        //                     removeChars+=2;
+        //                 }
+        //                 // move codes in bufor
+        //                 for (int h = 0; h < characterBinaryLen - index; h++)
+        //                 {
+        //                     characterBinary[h] = characterBinary[8 - characterBinaryLen + h];
+        //                 }
+        //                 characterBinaryLen -= index;
+        //                 index = 0;
+        //                 // for(int n = 0; n < dataLength; n++){
+        //                 //     printf("%c", data[n]);
+        //                 // }
+        //                 // printf("\n");
+        //             }
+        //         }
+        //     }
+        //     index++;
+        // }
        
-        // free(bufor);
-        // free(characterRead);
-        for(int i = 0; i < uniqueCounter; i++){
-            free(codes[i]);
-        }
-        free(codes);
-        free(characterBinary);
-        free(header);
-        free(binaryBufor);
+        // // free(bufor);
+        // // free(characterRead);
+        // for(int i = 0; i < uniqueCounter; i++){
+        //     free(codes[i]);
+        // }
+        // free(codes);
+        // free(characterBinary);
+        // free(header);
+        // free(binaryBufor);
 
         
-        printf("all: %d remove: %d\n", allChars, removeChars);
-        int check = truncate(outputFile, allChars - (removeChars));
-        allChars -= removeChars;
+        // // printf("all: %d remove: %d\n", allChars, removeChars);
+        // int check = truncate(outputFile, allChars - (removeChars));
+        // allChars -= removeChars;
 
-        out = fopen(outputFile, "rb");
-        rewind(out);
+        // out = fopen(outputFile, "rb");
+        // rewind(out);
         
-        while(len = fread(nullBufor, 1, 2000, out)){
-            // for(int i = 0 ; i < len; i++)
-            //     printf("%d ", nullBufor[i]);
-            // printf("\n");
+        // while(len = fread(nullBufor, 1, 2000, out)){
+        //     // for(int i = 0 ; i < len; i++)
+        //     //     printf("%d ", nullBufor[i]);
+        //     // printf("\n");
 
-            if(nullBufor[len - 2] == 0)
-                nullCounter[0] = 1;
-            else
-                nullCounter[0] = 0;
+        //     if(nullBufor[len - 2] == 0)
+        //         nullCounter[0] = 1;
+        //     else
+        //         nullCounter[0] = 0;
 
-            printf("%d\n", nullBufor[len-1]);
-            if(nullBufor[len - 1] == 0)
-                nullCounter[1] = 1;
-            else
-                nullCounter[1] = 0;
-        }
-        free(nullBufor);
-        fclose(out);
-         if(nullCounter[1] == 1 && nullCounter[0] == 1){
-            printf("trun2\n");
-            truncate(outputFile, allChars - 2);
-            allChars -= 2;
-        }
-        else if(nullCounter[1] == 1 ){
-            printf("trun1: ");                 
-            printf("%d\n", truncate(outputFile, allChars - 1));
-            allChars--;
-        }
+        //     // printf("%d\n", nullBufor[len-1]);
+        //     if(nullBufor[len - 1] == 0)
+        //         nullCounter[1] = 1;
+        //     else
+        //         nullCounter[1] = 0;
+        // }
+        // free(nullBufor);
+        // fclose(out);
+        //  if(nullCounter[1] == 1 && nullCounter[0] == 1){
+        //     // printf("trun2\n");
+        //     truncate(outputFile, allChars - 2);
+        //     allChars -= 2;
+        // }
+        // else if(nullCounter[1] == 1 ){
+        //     // printf("trun1: ");                 
+        //     // printf("%d\n", truncate(outputFile, allChars - 1));
+        //     allChars--;
+        // }
     }
     else {    
         // number of unique chars
@@ -774,7 +829,7 @@ int main( int argc, char **argv) {
 
         // printQueue(queue, uniqueCounter);
 
-        printf("U: %d\n", uniqueCounter);
+        // printf("U: %d\n", uniqueCounter);
         
         // make a binary tree
         int temp = 0;
@@ -783,7 +838,8 @@ int main( int argc, char **argv) {
             // quickSortQueue(queue, 2*(temp+1), uniqueCounter + temp);
             // printf("%d\n", temp);
             temp++;
-            printf("Iteration: %d\n", temp);
+            if(temp % 1000 == 0)
+                printf("Iteration: %d\n", temp);
         }
 
         // temporary array for reading codes
