@@ -314,6 +314,7 @@ void twelveOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes,
     free( bufor );
 }
 
+/*
 int twelveDictionary( node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
         char *character = malloc( sizeof *character );
         char *characterBinary = malloc( 8 * sizeof *characterBinary );
@@ -469,3 +470,4 @@ int twelveDictionary( node *pointer, node *border, node *root, node *last, FILE 
         free(characterBinary);
         return buforLength;
     }
+*/

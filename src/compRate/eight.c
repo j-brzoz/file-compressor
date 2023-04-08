@@ -116,7 +116,7 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     free( character );
     free( characterBinary );
 }
-
+/*
 int eightDictionary(node *pointer, node *border, node *root, node *last, FILE *out, int buforLength, char *bufor) {
     char *character = malloc(sizeof *character);
     char *characterBinary = malloc(8 * sizeof *characterBinary);
@@ -418,4 +418,4 @@ node *readDicEight(FILE *in, char *bufor, int buforLength, unsigned short *charz
     free(characterBinary);
     return pointerlast;
 }
-
+*/

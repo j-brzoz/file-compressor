@@ -817,7 +817,7 @@ int main( int argc, char **argv) {
 
         // put inputs in a queue
         for(int i = 0; i < uniqueCounter; i++){
-            node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL, NULL);
+            node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL);
             if(tmpNode == NULL){
                 return 1;
             }

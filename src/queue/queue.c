@@ -53,9 +53,7 @@ void addNewNodeToQueue(node **queue, int queueSize){
     node *secondNode = findMinNotUsedNode(queue, queueSize);
     for(int i = 0; i < queueSize; i++){
         if(queue[i] == NULL){
-            queue[i] = makeNode(NULL, firstNode->freq + secondNode->freq, false, firstNode, secondNode, NULL);
-            firstNode->parent = queue[i];
-            secondNode->parent = queue[i];
+            queue[i] = makeNode(NULL, firstNode->freq + secondNode->freq, false, firstNode, secondNode);
             break;
         }
     }

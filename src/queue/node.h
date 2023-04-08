@@ -10,9 +10,8 @@ typedef struct node{
     bool used;
     struct node *left;
     struct node *right;
-    struct node *parent;
 }node;
 
-node *makeNode(unsigned short *character, int frequency, bool used, node *left, node *right, node *parent);
+node *makeNode(unsigned short *character, int frequency, bool used, node *left, node *right);
 
 #endif
