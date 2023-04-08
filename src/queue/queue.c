@@ -25,12 +25,26 @@ bool notFull(node **queue, int size){
 
 // finds nodes with minimum frequency, that don't have a parent already
 node *findMinNotUsedNode(node **queue, int queueSize){
+    long long int minFrequency = 1000000000000; // aprox 1TB
+    int minIndex;
     for(int i = 0; i < queueSize; i++){
-        if(queue[i]->used == false){
-            queue[i]->used = true;
-            return queue[i];
+        if(queue[i] == NULL){
+            queue[minIndex]->used = true;
+            return queue[minIndex];
+        }
+        if(queue[i] != NULL && queue[i]->used == false && queue[i]->freq < minFrequency) {
+            minFrequency = queue[i]->freq;
+            minIndex = i;
         }
     }
+    // for(int i = 0; i < queueSize; i++){
+    //     if(queue[i]->used == false){
+    //         queue[i]->used = true;
+    //         return queue[i];
+    //     }
+    // }
+    queue[minIndex]->used = true;
+    return queue[minIndex];
 }
 
 // makes new node, that points to 2 other nodes
