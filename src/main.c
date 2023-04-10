@@ -95,6 +95,7 @@ int main( int argc, char **argv) {
             break;
         case 'h':       // print help
             printf("%s", helpString);
+            return 0;
             break;
         case 'o':       // output file
             outputFile = optarg;

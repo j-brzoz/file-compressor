@@ -157,7 +157,35 @@ test-big: test-8-big test-12-big test-16-big
 
 test-all: test-8-all test-12-all test-16-all
 
-clean:
+test-features: compressor
+	@echo "========== Test password protection =========="
+	@./compressor -x tests/small/easy.txt -o easy8.huff -1 -c password
+	@./compressor -z easy8.huff -o easy8.txt -c password
+	@./compressor -x tests/small/easy.txt -o easy12.huff -2 -c password
+	@./compressor -z easy12.huff -o easy12.txt -c password
+	@./compressor -x tests/small/easy.txt -o easy16.huff -3 -c password
+	@./compressor -z easy16.huff -o easy16.txt -c password
+	@cmp -s tests/small/easy.txt easy8.txt && echo "8 - SAME - easy.txt with password" || echo "8 - DIFF - easy.txt with password"
+	@cmp -s tests/small/easy.txt easy12.txt && echo "12 - SAME - easy.txt with password" || echo "12 - DIFF - easy.txt with password"
+	@cmp -s tests/small/easy.txt easy16.txt && echo "16 - SAME - easy.txt with password" || echo "16 - DIFF - easy.txt with password"
+	@echo "========== Test verbose mode with compression =========="
+	@./compressor -x tests/small/easy.txt -o easy8.huff -1 -v
+	@echo "========== Test verbose mode with decompression =========="
+	@./compressor -z easy8.huff -o easy8.txt -v
+	@echo "========== Test help message =========="
+	@./compressor -h
+	@rm *.txt
+	@rm *.huff
+
+clean-small:
 	@rm compressor
 	@rm *.txt
 	@rm *.huff
+
+clean-big:
+	@rm compressor
+	@rm *.txt
+	@rm *.huff
+	@rm *.jpg
+	@rm *.pdf
+	@rm *.png
