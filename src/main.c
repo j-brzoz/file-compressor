@@ -268,6 +268,24 @@ int main( int argc, char **argv) {
             power *= 256;
         }
 
+        unsigned char crcCheck[1];
+        while(fread(crcCheck, 1, 1, in)){
+            crcCheck[0] = crcCheck[0] ^ password;
+            crc = crc ^ crcCheck[0];
+        }
+        if( crc != 'J' ) {
+            printf("The file has been damaged!\n");
+            fclose(out);
+            fclose(in);
+            free(header);
+            return 2;
+        }
+
+        unsigned char moveBytes[10];
+
+        rewind(in);
+        fread(moveBytes, 1, 10, in);
+
         // codes
         unsigned short **codes;
         codes = malloc(uniqueCounter * sizeof *codes);
@@ -284,7 +302,7 @@ int main( int argc, char **argv) {
             fread( bufor, 1, 1, in );
             byteInInputFile++;
             bufor[0] = bufor[0] ^ password;
-            crc = crc ^ bufor[0];
+            // crc = crc ^ bufor[0];
             dictLength -= 8;
             
             // convert to 8 bit
@@ -359,7 +377,7 @@ int main( int argc, char **argv) {
                         fread( bufor, 1, 1, in );
                         byteInInputFile++;
                         bufor[0] = bufor[0] ^ password;
-                        crc = crc ^ bufor[0];
+                        // crc = crc ^ bufor[0];
                         dictLength -= 8;
                         tmpBinary = DectoBin((unsigned short)bufor[0], 8);
                          // omit added zeros if last byte
@@ -529,20 +547,20 @@ int main( int argc, char **argv) {
             outputCharLength = 0;
         }
     
-        if( crc != 'J' ) {
-            printf("The file has been damaged!\n");
-            fclose(out);
-            fclose(in);
+        // if( crc != 'J' ) {
+        //     printf("The file has been damaged!\n");
+        //     fclose(out);
+        //     fclose(in);
             
-            for(int i = 0; i < uniqueCounter; i++){
-                free(codes[i]);
-            }
-            free(codes);
-            free(header);
-            free(binaryBufor);
+        //     for(int i = 0; i < uniqueCounter; i++){
+        //         free(codes[i]);
+        //     }
+        //     free(codes);
+        //     free(header);
+        //     free(binaryBufor);
             
-            return 2;
-        }
+        //     return 2;
+        // }
 
         rewind(out);
         
@@ -629,8 +647,13 @@ int main( int argc, char **argv) {
         else if(inputSize == 12)
             uniqueCounter = twelveAnalyzeInput(in, charcounter, uniqueCounter);
 
+        if(uniqueCounter == 0){
+            fprintf(stderr, "You are trying to compress an empty file!\n");
+            free(charcounter);
+            return 3;
+        }
         // if there is one char in the file
-        if( uniqueCounter == 1 ) {
+        else if( uniqueCounter == 1 ) {
             uniqueCounter++;
         }
         // characters found in the input
