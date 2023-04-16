@@ -10,6 +10,10 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     unsigned short input;
     // bufor for reading from input file
     unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    if(inputBufor == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
     // size of input bufor
     int inputBuforLength;
     // to check if number of bytes is odd 
@@ -73,22 +77,37 @@ int sixteenAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;
 }
 
-void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen, unsigned char *crc ) {
+int sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen, unsigned char *crc ) {
     // for character conversion from binary to decimal 
     unsigned short input;
     // bufor for reading from input file
     unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    if(inputBufor == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
     // size of input bufor
     int inputBuforLength;
     // to check if number of bytes is odd 
     int isOdd;
     // charcter that will be put in the output file
-    unsigned char* character = malloc( sizeof *character );
+    unsigned char character[1];
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
+    if(characterBinary == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        free(inputBufor);
+        return -1;
+    }
     characterBinary[0] = 0;
     // bufor with codes from characters found in the input
     unsigned char *bufor = malloc( 16384 * sizeof *bufor );
+    if(bufor == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        free(characterBinary);
+        free(inputBufor);
+        return -1;
+    }
     // length of the bufor
     int buforLength = 0;
     // count how many zeros we add artficially
@@ -216,10 +235,18 @@ void sixteenOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes
     }
 
     // write header
-    header(out, 16, zeroCounter, crc[0]);
+    int checkHeader;
+    checkHeader = header(out, 16, zeroCounter, crc[0]);
+    if(checkHeader == -1){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        free( inputBufor );
+        free( characterBinary );
+        free( bufor );
+        return -1;
+    }
 
     free( inputBufor );
-    free( character );
     free( characterBinary );
     free( bufor );
+    return 0;
 }

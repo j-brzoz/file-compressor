@@ -176,6 +176,10 @@ int main( int argc, char **argv) {
         unsigned long long int inputFileLength = 0;
         // bufor
         unsigned char *inputFileBufor = malloc(2000 * sizeof * inputFileBufor);
+        if(inputFileBufor == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            return -1;
+        }
         // bufor length
         int length = 0;
         while( length = fread(inputFileBufor, 1, 2000, in)){
@@ -200,6 +204,11 @@ int main( int argc, char **argv) {
         // convert info to binary string
         char *header;
         header = DectoBin((unsigned short)info[0], 8);
+        if(header == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(inputFileBufor);
+            return -1;
+        }
 
         // make sure the file has not been damaged
         if(header[0] != '1' || header[1] != '1' || header[4] != '1'){
@@ -289,11 +298,22 @@ int main( int argc, char **argv) {
         // codes
         unsigned short **codes;
         codes = malloc(uniqueCounter * sizeof *codes);
+        if(codes == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(header);
+            return -1;
+        }
         for(int i = 0; i < uniqueCounter; i++)
             codes[i] = NULL;
 
         unsigned char bufor[1];
         char *binaryBufor = malloc( 2048 * sizeof * binaryBufor);
+        if(binaryBufor == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(codes);
+            free(header);
+            return -1;
+        }
         int binaryBuforLength = 0;
         char *tmpBinary;
         int index;
@@ -307,6 +327,13 @@ int main( int argc, char **argv) {
             
             // convert to 8 bit
             tmpBinary = DectoBin((unsigned short)bufor[0], 8);
+            if(tmpBinary == NULL){
+                fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                free(codes);
+                free(header);
+                free(binaryBufor);
+                return -1;
+            }
 
             // omit added zeros if last byte
             if(byteInInputFile != inputFileLength){
@@ -345,6 +372,16 @@ int main( int argc, char **argv) {
                 for(int j = 0; j < uniqueCounter; j++){
                     if(codes[j] == NULL){
                         codes[j] = malloc((codeLength+2) * sizeof codes);
+                        if(codes[j] == NULL){
+                            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                            for(int k = 0; k < j; k++){
+                                free(codes[k]);
+                            }
+                            free(codes);
+                            free(binaryBufor);
+                            free(header);
+                            return -1;
+                        }
                         codes[j][0] = value;
                         codes[j][1] = codeLength;
                         index = j;
@@ -380,6 +417,16 @@ int main( int argc, char **argv) {
                         // crc = crc ^ bufor[0];
                         dictLength -= 8;
                         tmpBinary = DectoBin((unsigned short)bufor[0], 8);
+                        if(tmpBinary == NULL){
+                            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                            for(int k = 0; k < uniqueCounter; k++){
+                                free(codes[k]);
+                            }
+                            free(codes);
+                            free(binaryBufor);
+                            free(header);
+                            return -1;
+                        }
                          // omit added zeros if last byte
                         if(byteInInputFile != inputFileLength){
                             for(int j = 0; j < 8; j++){
@@ -444,6 +491,16 @@ int main( int argc, char **argv) {
                 c[0] = c[0] ^ password;
                 crc = crc ^ c[0];
                 characterBinary = DectoBin( (unsigned short)(c[0]), 8);
+                if(characterBinary == NULL){
+                    fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                    for(int k = 0; k < uniqueCounter; k++){
+                        free(codes[k]);
+                    }
+                    free(codes);
+                    free(binaryBufor);
+                    free(header);
+                    return -1;
+                }
             
                 // omit added zeros if last byte
                 if(byteInInputFile != inputFileLength) {
@@ -547,27 +604,22 @@ int main( int argc, char **argv) {
             outputCharLength = 0;
         }
     
-        // if( crc != 'J' ) {
-        //     printf("The file has been damaged!\n");
-        //     fclose(out);
-        //     fclose(in);
-            
-        //     for(int i = 0; i < uniqueCounter; i++){
-        //         free(codes[i]);
-        //     }
-        //     free(codes);
-        //     free(header);
-        //     free(binaryBufor);
-            
-        //     return 2;
-        // }
-
         rewind(out);
         
         // delete trailing NULLs that are put in decompressed file 
         // if number of chars in initially compressed file was odd for 16 bit compression
         // if number of chars in initially compressed file was not divisible by 3 for 12 bit compression
         unsigned char *nullBufor = malloc(2000 * sizeof * nullBufor);
+        if(nullBufor == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            for(int k = 0; k < uniqueCounter; k++){
+                free(codes[k]);
+            }
+            free(codes);
+            free(binaryBufor);
+            free(header);
+            return -1;
+        }
         int nullCounter[2] = {0, 0};
         int len;
         while(len = fread(nullBufor, 1, 2000, out)){
@@ -635,6 +687,11 @@ int main( int argc, char **argv) {
             charcounter =  malloc(possibleChars * sizeof *charcounter);
         }
 
+        if(charcounter == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            return -1;
+        }
+
         // make sure charcounter is filled with 0s
         for(int i = 0; i < possibleChars; i++)
             charcounter[i] = 0;
@@ -647,6 +704,11 @@ int main( int argc, char **argv) {
         else if(inputSize == 12)
             uniqueCounter = twelveAnalyzeInput(in, charcounter, uniqueCounter);
 
+        if(uniqueCounter == -1){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            return -1;
+        }
+
         if(uniqueCounter == 0){
             fprintf(stderr, "You are trying to compress an empty file!\n");
             free(charcounter);
@@ -658,8 +720,19 @@ int main( int argc, char **argv) {
         }
         // characters found in the input
         unsigned short *arr = malloc( uniqueCounter * sizeof *arr);
+        if(arr == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            return -1;
+        }
         // frequency of charcters from the input
         int *freq = malloc( uniqueCounter * sizeof *freq);
+        if(freq == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            free(arr);
+            return -1;
+        }
 
         int arrayIndex = 0;
         // convert data from charcounter to arr and freq
@@ -692,11 +765,26 @@ int main( int argc, char **argv) {
         // next code
         unsigned short **codes;
         codes = malloc(uniqueCounter * sizeof *codes);
+        if(codes == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            free(arr);
+            free(freq);
+            return -1;
+        }
         for(int i = 0; i < uniqueCounter; i++)
             codes[i] = NULL;
             
         // make a queue
         node **queue = malloc(queueSize * sizeof *queue);
+        if(queue == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            free(arr);
+            free(freq);
+            free(codes);
+            return -1;
+        }
         for(int i = 0; i < queueSize; i++)
             queue[i] = NULL;
 
@@ -704,16 +792,41 @@ int main( int argc, char **argv) {
         for(int i = 0; i < uniqueCounter; i++){
             node *tmpNode = makeNode(arr+i, freq[i], false, NULL, NULL);
             if(tmpNode == NULL){
+                fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                free(charcounter);
+                free(arr);
+                free(freq);
+                free(codes);
+                for(int k = 0; k < i; k++){
+                    free(queue[k]);
+                }
+                free(queue);
+                return -1;
+            }
+            if(tmpNode == NULL){
                 return 1;
             }
             queue[i] = tmpNode;
         }
         
         // make a binary tree
+        int checkNode;
         int temp = 0;
         while(notFull(queue, queueSize)){
-            addNewNodeToQueue(queue, queueSize);
             temp++;
+            checkNode = addNewNodeToQueue(queue, queueSize);
+            if(checkNode == -1){
+                fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+                free(charcounter);
+                free(arr);
+                free(freq);
+                free(codes);
+                for(int k = 0; k < temp; k++){
+                    free(queue[k]);
+                }
+                free(queue);
+                return -1;
+            }
         }
 
         // temporary array for reading codes
@@ -740,26 +853,62 @@ int main( int argc, char **argv) {
         fwrite( character, 1, 1, out );
 
         char *remainingChar = malloc(2048 * sizeof * remainingChar);
+        if(remainingChar == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            free(arr);
+            free(freq);
+            for(int i = 0; i < uniqueCounter; i++){
+                free(codes[i]);
+            }
+            for(int i = 0; i < queueSize; i++){
+                free(queue[i]);
+            }
+            free(codes);
+            free(queue);
+            return -1;
+        }
         int remainingLength;
 
         unsigned char *crc = malloc( 1 * sizeof * crc );
+        if(crc == NULL){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            free(charcounter);
+            free(arr);
+            free(freq);
+            for(int i = 0; i < uniqueCounter; i++){
+                free(codes[i]);
+            }
+            for(int i = 0; i < queueSize; i++){
+                free(queue[i]);
+            }
+            free(codes);
+            free(queue);
+            free(remainingChar);
+            return -1;
+        }
         crc[0] = 'J';
         // generate dictionary
         remainingLength = dictionary(codes, out, uniqueCounter, inputSize, remainingChar, crc, password);
 
         rewind(in);
-
+        int checkOutput;
         // generate output
         if(inputSize == 8)
-            eightOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
+            checkOutput = eightOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
         else if(inputSize == 16)
-            sixteenOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
+            checkOutput = sixteenOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
         else if(inputSize == 12)
-            twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
+            checkOutput = twelveOutputGenerator(in, uniqueCounter, codes, out, password, remainingChar, remainingLength, crc);
+
+        if(checkOutput == -1){
+            fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        }
 
         // free allocated memory
-        for(int i = 0; i < queueSize; i++)
+        for(int i = 0; i < queueSize; i++){
             free(queue[i]);
+        }
 
         free(queue);
 

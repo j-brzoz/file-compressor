@@ -12,34 +12,38 @@ int dictionary(unsigned short **codes, FILE *out, int uniqueCounter, int inputSi
         dictLength += inputSize + 8 + codes[i][1];
     }
     
-    byte[0] = (dictLength >> 24) & 0xFF;
+    byte[0] = (dictLength >> 24);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = (dictLength >> 16) & 0xFF;
+    byte[0] = (dictLength >> 16);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = (dictLength >> 8) & 0xFF;
+    byte[0] = (dictLength >> 8);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = dictLength & 0xFF;
+    byte[0] = dictLength;
     fwrite(byte, 1, 1, out);
 
     // unique counter
-    byte[0] = (uniqueCounter >> 24) & 0xFF;
+    byte[0] = (uniqueCounter >> 24);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = (uniqueCounter >> 16) & 0xFF;
+    byte[0] = (uniqueCounter >> 16);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = (uniqueCounter >> 8) & 0xFF;
+    byte[0] = (uniqueCounter >> 8);
     fwrite(byte, 1, 1, out);
 
-    byte[0] = uniqueCounter & 0xFF;
+    byte[0] = uniqueCounter;
     fwrite(byte, 1, 1, out);
 
     int buforLength = 0;
     char *value;
     char *byteBin = malloc(8 * sizeof * byteBin);
+    if(byteBin == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
 
     // write dictionary
     for(int i = 0; i < uniqueCounter; i++){

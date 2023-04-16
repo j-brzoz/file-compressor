@@ -42,15 +42,19 @@ node *findMinNotUsedNode(node **queue, int queueSize){
 }
 
 // makes new node, that points to 2 other nodes
-void addNewNodeToQueue(node **queue, int queueSize){
+int addNewNodeToQueue(node **queue, int queueSize){
     node *firstNode = findMinNotUsedNode(queue, queueSize);
     node *secondNode = findMinNotUsedNode(queue, queueSize);
     for(int i = 0; i < queueSize; i++){
         if(queue[i] == NULL){
             queue[i] = makeNode(NULL, firstNode->freq + secondNode->freq, false, firstNode, secondNode);
+            if(queue[i] == NULL){
+                return -1;
+            }
             break;
         }
     }
+    return 0;
 }
 
 // put values in codes array

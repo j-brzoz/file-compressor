@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include "convert.h"
 
-void header(FILE *out, int inputSize, int zeroCounter, unsigned char crc){
+int header(FILE *out, int inputSize, int zeroCounter, unsigned char crc){
     // charcter that will be put in the output file
-    char* character = malloc( sizeof *character );
+    char character[1];
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
+    if(characterBinary == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
 
     // to check if file has not been damaged
     characterBinary[0] = '1';
@@ -84,6 +88,6 @@ void header(FILE *out, int inputSize, int zeroCounter, unsigned char crc){
     character[0] = crc;
     fwrite( character, 1, 1, out );
 
-    free(character);
     free(characterBinary);
+    return 0;
 }

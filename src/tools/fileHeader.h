@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-void header(FILE *out, int inputSize, int zeroCounter, char crc);
+int header(FILE *out, int inputSize, int zeroCounter, char crc);
 
 #endif

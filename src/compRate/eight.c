@@ -8,6 +8,10 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     
     // bufor for reading from input file
     unsigned char *inputBufor = malloc( 1200 * sizeof *inputBufor );
+    if(inputBufor == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
     // size of input bufor
     int inputBuforLength;
 
@@ -26,16 +30,25 @@ int eightAnalyzeInput( FILE* in, int* charcounter, int uniqueCounter ) {
     return uniqueCounter;       
 }
 
-void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen, unsigned char *crc ) {
+int eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, FILE *out, char password, char *remainingChar, int remainingLen, unsigned char *crc ) {
     
     // char read from the file
-    unsigned char *c = malloc(sizeof *c);
+    unsigned char c[1];
     // charcter that will be put in the output file
-    unsigned char* character = malloc( sizeof *character );
+    unsigned char character[1];
     // binary representation of charcter   
     char *characterBinary = malloc( 8 * sizeof *characterBinary );
+    if(characterBinary == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        return -1;
+    }
     // bufor with codes from characters found in the input
     unsigned char *bufor = malloc( 16384 * sizeof *bufor );
+    if(bufor == NULL){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        free(characterBinary);
+        return -1;
+    }
     // length of the bufor
     int buforLength = 0;
     // count how many zeros we add artficially
@@ -110,10 +123,16 @@ void eightOutputGenerator( FILE* in, int uniqueCounter, unsigned short** codes, 
     }
 
     // write header
-    header(out, 8, zeroCounter, crc[0]);
+    int checkHeader;
+    checkHeader = header(out, 8, zeroCounter, crc[0]);
+    if(checkHeader == -1){
+        fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+        free( bufor );
+        free( characterBinary );
+        return -1;
+    }
 
-    free(c);
     free( bufor );
-    free( character );
     free( characterBinary );
+    return 0;
 }
