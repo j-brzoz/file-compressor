@@ -178,6 +178,8 @@ int main( int argc, char **argv) {
         unsigned char *inputFileBufor = malloc(2000 * sizeof * inputFileBufor);
         if(inputFileBufor == NULL){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            fclose(out);
+            fclose(in);
             return -1;
         }
         // bufor length
@@ -195,7 +197,12 @@ int main( int argc, char **argv) {
 
         // get info from header
         unsigned char info[1];
-        fread(info, 1, 1, in);
+        if(!fread(info, 1, 1, in)){
+            fprintf(stderr, "There was a problem with reading from the file!");
+            fclose(out);
+            fclose(in);
+            return -2;
+        }
         byteInInputFile++;
 
         // compression rate of compressed file 
@@ -206,6 +213,8 @@ int main( int argc, char **argv) {
         header = DectoBin((unsigned short)info[0], 8);
         if(header == NULL){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            fclose(out);
+            fclose(in);
             free(inputFileBufor);
             return -1;
         }
@@ -245,7 +254,13 @@ int main( int argc, char **argv) {
         }
         
         // more info
-        fread(info, 1, 1, in);
+        if(!fread(info, 1, 1, in)){
+            fprintf(stderr, "There was a problem with reading from the file!");
+            free(header);
+            fclose(out);
+            fclose(in);
+            return -2;
+        }
         byteInInputFile++;
 
         // get crc from info
@@ -256,7 +271,13 @@ int main( int argc, char **argv) {
         unsigned char dictLengthBin[4];
         unsigned short value;
         unsigned short codeLength = 0;
-        fread( dictLengthBin, 1, 4, in);
+        if(!fread( dictLengthBin, 1, 4, in)){
+            fprintf(stderr, "There was a problem with reading from the file!");
+            free(header);
+            fclose(out);
+            fclose(in);
+            return -2;
+        }
         byteInInputFile += 4;
 
         int dictLength = 0;
@@ -268,7 +289,13 @@ int main( int argc, char **argv) {
 
         // unumber of unique values
         unsigned char uniqueCounterBin[4];
-        fread( uniqueCounterBin, 1, 4, in);
+        if(!fread( uniqueCounterBin, 1, 4, in)){
+            fprintf(stderr, "There was a problem with reading from the file!");
+            free(header);
+            fclose(out);
+            fclose(in);
+            return -2;
+        }
         byteInInputFile += 4;
         int uniqueCounter = 0;
         power = 1;
@@ -293,7 +320,13 @@ int main( int argc, char **argv) {
         unsigned char moveBytes[10];
 
         rewind(in);
-        fread(moveBytes, 1, 10, in);
+        if(!fread(moveBytes, 1, 10, in)){
+            fprintf(stderr, "There was a problem with reading from the file!");
+            free(header);
+            fclose(out);
+            fclose(in);
+            return -2;
+        }
 
         // codes
         unsigned short **codes;
@@ -301,6 +334,8 @@ int main( int argc, char **argv) {
         if(codes == NULL){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
             free(header);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         for(int i = 0; i < uniqueCounter; i++)
@@ -312,6 +347,8 @@ int main( int argc, char **argv) {
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
             free(codes);
             free(header);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         int binaryBuforLength = 0;
@@ -319,7 +356,15 @@ int main( int argc, char **argv) {
         int index;
         while( dictLength > 0 ) {
             // read byte
-            fread( bufor, 1, 1, in );
+            if(!fread( bufor, 1, 1, in )){
+                fprintf(stderr, "There was a problem with reading from the file!");
+                free(codes);
+                free(header);
+                free(binaryBufor);
+                fclose(out);
+                fclose(in);
+                return -2;
+            }
             byteInInputFile++;
             bufor[0] = bufor[0] ^ password;
             // crc = crc ^ bufor[0];
@@ -332,6 +377,8 @@ int main( int argc, char **argv) {
                 free(codes);
                 free(header);
                 free(binaryBufor);
+                fclose(out);
+                fclose(in);
                 return -1;
             }
 
@@ -380,6 +427,8 @@ int main( int argc, char **argv) {
                             free(codes);
                             free(binaryBufor);
                             free(header);
+                            fclose(out);
+                            fclose(in);
                             return -1;
                         }
                         codes[j][0] = value;
@@ -411,7 +460,18 @@ int main( int argc, char **argv) {
                 else {
                     // if not enough bits in bufor, get more bits 
                     while(codeLength > binaryBuforLength) {
-                        fread( bufor, 1, 1, in );
+                        if(!fread( bufor, 1, 1, in )){
+                            fprintf(stderr, "There was a problem with reading from the file!");
+                            for(int k = 0; k < uniqueCounter; k++){
+                                free(codes[k]);
+                            }
+                            free(codes);
+                            free(binaryBufor);
+                            free(header);
+                            fclose(out);
+                            fclose(in);
+                            return -2;
+                        }
                         byteInInputFile++;
                         bufor[0] = bufor[0] ^ password;
                         // crc = crc ^ bufor[0];
@@ -425,6 +485,8 @@ int main( int argc, char **argv) {
                             free(codes);
                             free(binaryBufor);
                             free(header);
+                            fclose(out);
+                            fclose(in);
                             return -1;
                         }
                          // omit added zeros if last byte
@@ -499,6 +561,8 @@ int main( int argc, char **argv) {
                     free(codes);
                     free(binaryBufor);
                     free(header);
+                    fclose(out);
+                    fclose(in);
                     return -1;
                 }
             
@@ -618,6 +682,8 @@ int main( int argc, char **argv) {
             free(codes);
             free(binaryBufor);
             free(header);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         int nullCounter[2] = {0, 0};
@@ -689,6 +755,8 @@ int main( int argc, char **argv) {
 
         if(charcounter == NULL){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            fclose(out);
+            fclose(in);
             return -1;
         }
 
@@ -706,12 +774,16 @@ int main( int argc, char **argv) {
 
         if(uniqueCounter == -1){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
+            fclose(out);
+            fclose(in);
             return -1;
         }
 
         if(uniqueCounter == 0){
             fprintf(stderr, "You are trying to compress an empty file!\n");
             free(charcounter);
+            fclose(out);
+            fclose(in);
             return 3;
         }
         // if there is one char in the file
@@ -723,6 +795,8 @@ int main( int argc, char **argv) {
         if(arr == NULL){
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
             free(charcounter);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         // frequency of charcters from the input
@@ -731,6 +805,8 @@ int main( int argc, char **argv) {
             fprintf(stderr, "There was a problem with allocating memory. Sorry!");
             free(charcounter);
             free(arr);
+            fclose(out);
+            fclose(in);
             return -1;
         }
 
@@ -770,6 +846,8 @@ int main( int argc, char **argv) {
             free(charcounter);
             free(arr);
             free(freq);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         for(int i = 0; i < uniqueCounter; i++)
@@ -783,6 +861,8 @@ int main( int argc, char **argv) {
             free(arr);
             free(freq);
             free(codes);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         for(int i = 0; i < queueSize; i++)
@@ -801,10 +881,9 @@ int main( int argc, char **argv) {
                     free(queue[k]);
                 }
                 free(queue);
+                fclose(out);
+                fclose(in);
                 return -1;
-            }
-            if(tmpNode == NULL){
-                return 1;
             }
             queue[i] = tmpNode;
         }
@@ -825,6 +904,8 @@ int main( int argc, char **argv) {
                     free(queue[k]);
                 }
                 free(queue);
+                fclose(out);
+                fclose(in);
                 return -1;
             }
         }
@@ -866,6 +947,8 @@ int main( int argc, char **argv) {
             }
             free(codes);
             free(queue);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         int remainingLength;
@@ -885,6 +968,8 @@ int main( int argc, char **argv) {
             free(codes);
             free(queue);
             free(remainingChar);
+            fclose(out);
+            fclose(in);
             return -1;
         }
         crc[0] = 'J';
